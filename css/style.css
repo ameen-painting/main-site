@@ -68,6 +68,7 @@ p  { font-size: 1rem; color: var(--text-muted); }
 }
 
 .section { padding-block: var(--section-py); }
+section[id] { scroll-margin-top: 90px; }
 .section-alt { background: var(--bg-alt); }
 
 .section-heading { text-align: center; margin-bottom: 56px; }
@@ -210,7 +211,7 @@ p  { font-size: 1rem; color: var(--text-muted); }
 .nav-list {
   display: flex;
   align-items: center;
-  gap: 36px;
+  gap: 26px;
 }
 .nav-link {
   font-size: 0.9rem;
@@ -303,6 +304,32 @@ p  { font-size: 1rem; color: var(--text-muted); }
   #site-header.nav-open .hamburger span:nth-child(3) {
     transform: translateY(-9px) rotate(-45deg);
   }
+}
+
+/* ---- 5b. SUB-PAGE HEADER (pricing/warranty/portfolio) ---- */
+.page-header {
+  padding: 160px 0 60px;
+  text-align: center;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+}
+.page-header-title {
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.page-header-sub {
+  color: var(--text-muted);
+  max-width: 560px;
+  margin: 0 auto;
+  font-size: 1.05rem;
+}
+
+/* Centered single-card CTA used on sub-pages */
+.page-cta-card {
+  max-width: 640px;
+  margin: 0 auto;
+  align-items: center;
+  text-align: center;
 }
 
 /* ---- 6. HERO ---- */
@@ -651,6 +678,22 @@ p  { font-size: 1rem; color: var(--text-muted); }
   cursor: pointer;
 }
 
+/* Bigger touch target on touchscreens — a 20px thumb is hard to grab with a finger */
+@media (pointer: coarse) {
+  .calc-field input[type="range"] {
+    height: 6px;
+    margin-block: 10px;
+  }
+  .calc-field input[type="range"]::-webkit-slider-thumb {
+    width: 30px;
+    height: 30px;
+  }
+  .calc-field input[type="range"]::-moz-range-thumb {
+    width: 30px;
+    height: 30px;
+  }
+}
+
 /* Select */
 .calc-field select {
   appearance: none;
@@ -726,6 +769,60 @@ p  { font-size: 1rem; color: var(--text-muted); }
   .calc-row { grid-template-columns: 1fr; gap: 20px; }
 }
 
+/* ---- 7e. PRICING & WARRANTY TEASER (homepage) ---- */
+.teaser-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+.teaser-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px;
+  transition: border-color var(--trans), transform var(--trans), box-shadow var(--trans);
+}
+.teaser-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(201, 168, 76, 0.1);
+}
+.teaser-card-icon {
+  width: 52px;
+  height: 52px;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+.teaser-card-icon svg { width: 100%; height: 100%; }
+.teaser-card h3 { color: var(--text); margin-bottom: 12px; }
+.teaser-card p { font-size: 0.95rem; margin-bottom: 24px; }
+.teaser-badge-mini {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: radial-gradient(circle at 30% 25%, var(--accent-dim), var(--bg-card) 70%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.teaser-badge-mini span {
+  font-family: var(--font-heading);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+.teaser-badge-mini small {
+  margin-top: 3px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+
 /* ---- 8. PORTFOLIO ---- */
 .portfolio-filters {
   display: flex;
@@ -763,6 +860,10 @@ p  { font-size: 1rem; color: var(--text-muted); }
   cursor: pointer;
   aspect-ratio: 4/3;
   background: var(--bg-card);
+}
+.portfolio-preview-cta {
+  text-align: center;
+  margin-top: 36px;
 }
 .portfolio-item img {
   width: 100%;
@@ -1076,6 +1177,16 @@ p  { font-size: 1rem; color: var(--text-muted); }
 @media (max-width: 900px) {
   .warranty-grid { grid-template-columns: 1fr; gap: 32px; }
 }
+
+/* FAQ accordion list (reuses .warranty-details styling) */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.faq-list .warranty-details { max-width: none; }
 
 /* ---- 11. CONTACT ---- */
 .contact-grid {

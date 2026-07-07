@@ -243,7 +243,8 @@ function renderLightbox() {
 }
 
 function initLightbox() {
-  const lb   = document.getElementById('lightbox');
+  const lb = document.getElementById('lightbox');
+  if (!lb) return;
   const over = lb.querySelector('.lightbox-overlay');
   const cls  = lb.querySelector('.lightbox-close');
   const prev = lb.querySelector('.lightbox-prev');
