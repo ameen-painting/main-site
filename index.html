@@ -81,12 +81,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <ul class="nav-list">
           <li><a href="#hero" class="nav-link active">Home</a></li>
           <li><a href="#services" class="nav-link">Services</a></li>
-          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
           <li><a href="portfolio.html" class="nav-link">Portfolio</a></li>
-          <li><a href="warranty.html" class="nav-link">Warranty</a></li>
+          <li><a href="#pricing" class="nav-link">Pricing</a></li>
+          <li><a href="#warranty" class="nav-link">Warranty</a></li>
           <li><a href="#about" class="nav-link">About</a></li>
           <li><a href="#contact" class="nav-link">Contact</a></li>
-          <li><a href="https://forms.gle/6kuEJF3T7V3bLef3A" target="_blank" rel="noopener noreferrer" class="nav-link nav-cta">Get a Quote</a></li>
+          <li><a href="#contact" class="nav-link nav-cta">Get a Quote</a></li>
         </ul>
       </nav>
       <button id="hamburger" class="hamburger" aria-label="Toggle menu" aria-expanded="false">
@@ -104,14 +104,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="hero-content container">
         <p class="hero-eyebrow" data-animate>Premium Painting Services</p>
         <h1 class="hero-title" data-animate data-animate-delay="1">
-          San Antonio's Commercial<br />Painting Specialists
+          San Antonio's Residential<br />Painting Specialists
         </h1>
         <p class="hero-sub" data-animate data-animate-delay="2">
-          Serving San Antonio, TX and surrounding areas — tenant improvement, commercial repaints, and everything in between.<br />
+          Serving San Antonio, TX and surrounding areas — tenant improvement, residential repaints, and everything in between.<br />
           Precision finishes delivered on schedule, every time.
         </p>
         <div class="hero-actions" data-animate data-animate-delay="3">
-          <a href="https://forms.gle/6kuEJF3T7V3bLef3A" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Get a Free Quote</a>
+          <a href="#contact" class="btn btn-primary">Get a Free Quote</a>
           <a href="#portfolio" class="btn btn-outline">View Our Work</a>
         </div>
       </div>
@@ -125,56 +125,87 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="container">
         <div class="section-heading" data-animate>
           <p class="section-eyebrow">What We Do</p>
-          <h2>Commercial Painting Services</h2>
+          <h2>Residential Painting Services</h2>
           <div class="gold-rule"></div>
-          <p class="section-desc">From tenant improvement to punch-list closeout — we handle the full spectrum of commercial paint scopes.</p>
+          <p class="section-desc">From a single-room refresh to a full exterior repaint — explore the services homeowners rely on us for most.</p>
         </div>
-        <div class="services-grid">
-          <div class="service-card" data-animate data-animate-delay="1">
-            <div class="service-icon">
+        <div class="services-accordion" data-animate>
+          <div class="accordion-item is-active" data-index="0">
+            <span class="accordion-item-bg accordion-item-bg--1" aria-hidden="true"></span>
+            <span class="accordion-icon">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect x="4" y="10" width="40" height="28" rx="3" stroke="currentColor" stroke-width="2.5"/>
-                <path d="M4 18h40" stroke="currentColor" stroke-width="2.5"/>
-                <path d="M16 10v8M32 10v8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                <circle cx="24" cy="30" r="3" stroke="currentColor" stroke-width="2.5"/>
+                <rect x="10" y="8" width="20" height="10" rx="2" stroke="currentColor" stroke-width="2.5"/>
+                <path d="M16 18v8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <rect x="12" y="26" width="8" height="14" rx="2" stroke="currentColor" stroke-width="2.5"/>
               </svg>
-            </div>
-            <h3>Tenant Improvement</h3>
-            <p>Full TI painting scopes for new build-outs and commercial renovations. We coordinate with GCs and finish on schedule without cutting corners.</p>
+            </span>
+            <span class="accordion-item-collapsed-label">Interior Painting</span>
+            <span class="accordion-item-body">
+              <span class="accordion-item-title">Interior Painting</span>
+              <span class="accordion-item-desc">Walls, ceilings, trim, and accent finishes — clean lines and a flawless finish in every room of your home.</span>
+            </span>
           </div>
-          <div class="service-card" data-animate data-animate-delay="2">
-            <div class="service-icon">
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect x="6" y="6" width="36" height="36" rx="4" stroke="currentColor" stroke-width="2.5"/>
-                <path d="M14 24h20M14 32h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M24 14l-4 6h8l-4-6z" fill="currentColor"/>
-              </svg>
-            </div>
-            <h3>Commercial Repaints</h3>
-            <p>Offices, retail stores, restaurants, medical suites, and multifamily common areas — refreshed with minimal disruption and professional-grade results.</p>
-          </div>
-          <div class="service-card" data-animate data-animate-delay="3">
-            <div class="service-icon">
+          <div class="accordion-item" data-index="1">
+            <span class="accordion-item-bg accordion-item-bg--2" aria-hidden="true"></span>
+            <span class="accordion-icon">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M8 36V16l16-8 16 8v20" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
                 <rect x="18" y="28" width="12" height="8" rx="1" stroke="currentColor" stroke-width="2.5"/>
                 <path d="M24 16v6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
                 <circle cx="24" cy="14" r="2" fill="currentColor"/>
               </svg>
-            </div>
-            <h3>Exterior Refreshes</h3>
-            <p>Commercial exterior repaints and building façade refreshes. Durable coatings, proper surface prep, and clean edges that hold up to the elements.</p>
+            </span>
+            <span class="accordion-item-collapsed-label">Exterior Painting</span>
+            <span class="accordion-item-body">
+              <span class="accordion-item-title">Exterior Painting</span>
+              <span class="accordion-item-desc">Full exterior repaints built to stand up to San Antonio heat, sun, and storms — proper prep and durable coatings that last.</span>
+            </span>
           </div>
-          <div class="service-card" data-animate data-animate-delay="4">
-            <div class="service-icon">
+          <div class="accordion-item" data-index="2">
+            <span class="accordion-item-bg accordion-item-bg--3" aria-hidden="true"></span>
+            <span class="accordion-icon">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M12 36l4-8 8 4 4-16 4 12 4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="38" cy="12" r="4" stroke="currentColor" stroke-width="2.5"/>
-                <path d="M38 8V6M38 18v-2M42 12h2M34 12h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <rect x="8" y="6" width="32" height="36" rx="2" stroke="currentColor" stroke-width="2.5"/>
+                <path d="M24 6v36" stroke="currentColor" stroke-width="2.5"/>
+                <circle cx="18" cy="24" r="1.8" fill="currentColor"/>
+                <circle cx="30" cy="24" r="1.8" fill="currentColor"/>
               </svg>
-            </div>
-            <h3>Punch-list &amp; Subcontract Support</h3>
-            <p>Reliable backup, overflow, and urgent closeout painting for GCs and PMs. We step in fast, execute cleanly, and don't slow down your schedule.</p>
+            </span>
+            <span class="accordion-item-collapsed-label">Cabinet Refinishing</span>
+            <span class="accordion-item-body">
+              <span class="accordion-item-title">Cabinet Refinishing</span>
+              <span class="accordion-item-desc">Kitchen and bath cabinets refinished to look brand new — a fraction of the cost of full replacement.</span>
+            </span>
+          </div>
+          <div class="accordion-item" data-index="3">
+            <span class="accordion-item-bg accordion-item-bg--4" aria-hidden="true"></span>
+            <span class="accordion-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M10 34l18-18 6 6-18 18-8-2 2-4z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+                <path d="M28 16l4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="accordion-item-collapsed-label">Drywall Repair &amp; Touch-Ups</span>
+            <span class="accordion-item-body">
+              <span class="accordion-item-title">Drywall Repair &amp; Touch-Ups</span>
+              <span class="accordion-item-desc">Patching, texture matching, and paint correction handled before the final coat ever goes on.</span>
+            </span>
+          </div>
+          <div class="accordion-item" data-index="4">
+            <span class="accordion-item-bg accordion-item-bg--5" aria-hidden="true"></span>
+            <span class="accordion-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="4" y="10" width="40" height="28" rx="3" stroke="currentColor" stroke-width="2.5"/>
+                <path d="M4 18h40" stroke="currentColor" stroke-width="2.5"/>
+                <path d="M16 10v8M32 10v8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="24" cy="30" r="3" stroke="currentColor" stroke-width="2.5"/>
+              </svg>
+            </span>
+            <span class="accordion-item-collapsed-label">Commercial &amp; Tenant Improvement</span>
+            <span class="accordion-item-body">
+              <span class="accordion-item-title">Commercial &amp; Tenant Improvement</span>
+              <span class="accordion-item-desc">Office, retail, and multifamily repaints and TI scopes for GCs and property managers — also available on request.</span>
+            </span>
           </div>
         </div>
 
@@ -185,57 +216,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <h3>Core Capabilities</h3>
           </div>
           <ul class="capabilities-list">
-            <li>Commercial interior &amp; exterior painting</li>
-            <li>Tenant improvement (TI) projects</li>
-            <li>Office, retail, restaurant &amp; medical space repaints</li>
-            <li>Multifamily common area painting</li>
-            <li>Drywall touch-up &amp; paint correction</li>
-            <li>Punch-list &amp; closeout painting support</li>
-            <li>Maintenance painting &amp; refreshes</li>
+            <li>Residential interior &amp; exterior painting</li>
+            <li>Whole-home repaints &amp; single-room refreshes</li>
+            <li>Cabinet refinishing &amp; drywall touch-up</li>
             <li>Surface preparation, priming &amp; finish coats</li>
             <li>Doors, trim, walls, ceilings &amp; accent finishes</li>
-            <li>Small-to-mid-size subcontracted paint scopes</li>
+            <li>Maintenance painting &amp; color refreshes</li>
+            <li>Commercial interior &amp; exterior painting</li>
+            <li>Tenant improvement (TI) projects</li>
+            <li>Multifamily common area painting</li>
+            <li>Punch-list &amp; closeout painting support</li>
           </ul>
         </div>
       </div>
     </section>
 
     <hr class="divider" />
-
-    <!-- ===== PRICING & WARRANTY TEASER ===== -->
-    <section id="pricing-warranty" class="section section-alt">
-      <div class="container">
-        <div class="section-heading" data-animate>
-          <p class="section-eyebrow">Transparent &amp; Backed</p>
-          <h2>Pricing &amp; Our Warranty</h2>
-          <div class="gold-rule"></div>
-          <p class="section-desc">Know what to expect before we start, and what's covered after we're done.</p>
-        </div>
-        <div class="teaser-grid">
-          <div class="teaser-card" data-animate data-animate-delay="1">
-            <div class="teaser-card-icon">
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect x="6" y="10" width="36" height="28" rx="3" stroke="currentColor" stroke-width="2.5"/>
-                <path d="M6 18h36M16 10v8M32 10v8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M24 24v8M20 28h8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <h3>What Commercial Painting Costs</h3>
-            <p>See typical per-square-foot ranges for TI, repaints, exterior refreshes, and punch-list work — plus a free paint coverage calculator.</p>
-            <a href="pricing.html" class="btn btn-outline btn-sm">View Pricing Guide &rarr;</a>
-          </div>
-          <div class="teaser-card" data-animate data-animate-delay="2">
-            <div class="teaser-badge-mini" aria-hidden="true">
-              <span>3</span>
-              <small>YEAR</small>
-            </div>
-            <h3>Backed By a 3-Year Warranty</h3>
-            <p>Every project is covered against peeling, blistering, cracking, or splitting from improper prep or application — no cost, no hassle.</p>
-            <a href="warranty.html" class="btn btn-outline btn-sm">View Warranty Details &rarr;</a>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- ===== PORTFOLIO PREVIEW ===== -->
     <section id="portfolio" class="section">
@@ -247,15 +243,204 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <p class="section-desc">A showcase of transformations — from preparation to pristine finish.</p>
         </div>
         <div class="portfolio-grid" data-animate>
-          <a href="portfolio.html" class="portfolio-item"><img src="assets/images/hollister-after-03.webp" alt="Hollister — Completed" loading="lazy" /></a>
-          <a href="portfolio.html" class="portfolio-item"><img src="assets/images/hollister-after-07.webp" alt="Hollister — Completed" loading="lazy" /></a>
-          <a href="portfolio.html" class="portfolio-item"><img src="assets/images/hollister-after-12.webp" alt="Hollister — Final Result" loading="lazy" /></a>
           <a href="portfolio.html" class="portfolio-item"><img src="assets/images/hollister-before-01.webp" alt="Hollister — Priming Phase" loading="lazy" /></a>
+          <a href="portfolio.html" class="portfolio-item"><img src="assets/images/hollister-before-02.webp" alt="Hollister — In Progress" loading="lazy" /></a>
+          <a href="portfolio.html" class="portfolio-item"><img src="assets/images/hollister-before-04.webp" alt="Hollister — Three-Coat Process" loading="lazy" /></a>
+          <a href="portfolio.html" class="portfolio-item"><img src="assets/images/hollister-after-12.webp" alt="Hollister — Final Result" loading="lazy" /></a>
           <a href="portfolio.html" class="portfolio-item"><img src="assets/images/hollister-after-15.webp" alt="Hollister — Flawless Result" loading="lazy" /></a>
           <a href="portfolio.html" class="portfolio-item"><img src="assets/images/hollister-after-16.webp" alt="Hollister — Showroom Quality" loading="lazy" /></a>
         </div>
         <div class="portfolio-preview-cta" data-animate data-animate-delay="1">
           <a href="portfolio.html" class="btn btn-outline">View Full Portfolio</a>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ===== PRICING GUIDE ===== -->
+    <section id="pricing" class="section section-alt">
+      <div class="container">
+        <div class="section-heading" data-animate>
+          <p class="section-eyebrow">Transparent Numbers</p>
+          <h2>What House Painting Costs</h2>
+          <div class="gold-rule"></div>
+          <p class="section-desc">Typical investment ranges for residential projects in the San Antonio area. Every home is walked and quoted individually — these numbers are a starting point, not a bid.</p>
+        </div>
+        <div class="pricing-table-wrap" data-animate>
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th>Project Type</th>
+                <th>Low</th>
+                <th>High</th>
+                <th>Average</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Project Type">Interior Painting <span>per sq ft, walls only</span></td>
+                <td data-label="Low">$1.50</td>
+                <td data-label="High">$2.10</td>
+                <td data-label="Average" class="avg">$1.80 / sq ft</td>
+              </tr>
+              <tr>
+                <td data-label="Project Type">Interior Painting <span>walls + ceilings + trim</span></td>
+                <td data-label="Low">$3.25</td>
+                <td data-label="High">$4.75</td>
+                <td data-label="Average" class="avg">$3.90 / sq ft</td>
+              </tr>
+              <tr>
+                <td data-label="Project Type">Single Room Repaint <span>avg bedroom</span></td>
+                <td data-label="Low">$500</td>
+                <td data-label="High">$1,000</td>
+                <td data-label="Average" class="avg">$720 / room</td>
+              </tr>
+              <tr>
+                <td data-label="Project Type">Whole-Home Interior <span>1,500–2,000 sq ft</span></td>
+                <td data-label="Low">$4,000</td>
+                <td data-label="High">$8,500</td>
+                <td data-label="Average" class="avg">$6,200 / project</td>
+              </tr>
+              <tr>
+                <td data-label="Project Type">Exterior Painting <span>1-story, avg home</span></td>
+                <td data-label="Low">$3,200</td>
+                <td data-label="High">$5,200</td>
+                <td data-label="Average" class="avg">$4,150 / project</td>
+              </tr>
+              <tr>
+                <td data-label="Project Type">Exterior Painting <span>2-story, avg home</span></td>
+                <td data-label="Low">$4,800</td>
+                <td data-label="High">$8,600</td>
+                <td data-label="Average" class="avg">$6,600 / project</td>
+              </tr>
+              <tr>
+                <td data-label="Project Type">Cabinet Refinishing <span>per door + drawer face</span></td>
+                <td data-label="Low">$110</td>
+                <td data-label="High">$170</td>
+                <td data-label="Average" class="avg">$140 / door</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="pricing-note" data-animate data-animate-delay="1">
+          Final pricing depends on square footage, surface condition, prep needs, and finish specification.
+          <a href="#contact">Request a free, project-specific estimate &rarr;</a>
+        </p>
+        <p class="pricing-note pricing-note-commercial" data-animate data-animate-delay="2">
+          <strong>Commercial &amp; Tenant Improvement:</strong> typically $2.50–$4.25 / sq ft depending on scope — every commercial project is walked and quoted individually.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== PAINT COVERAGE CALCULATOR ===== -->
+    <section id="calculator" class="section">
+      <div class="container">
+        <div class="section-heading" data-animate>
+          <p class="section-eyebrow">Plan Ahead</p>
+          <h2>Paint Coverage Calculator</h2>
+          <div class="gold-rule"></div>
+          <p class="section-desc">A quick ballpark on how much paint a space will need — handy for budgeting before your walkthrough.</p>
+        </div>
+        <div class="calculator-card" data-animate>
+          <div class="calc-inputs">
+            <div class="calc-field">
+              <label for="calc-width">Wall Width <span id="calc-width-val" class="calc-field-val">24 ft</span></label>
+              <input type="range" id="calc-width" min="4" max="200" value="24" step="1" />
+            </div>
+            <div class="calc-field">
+              <label for="calc-height">Wall Height <span id="calc-height-val" class="calc-field-val">9 ft</span></label>
+              <input type="range" id="calc-height" min="7" max="30" value="9" step="0.5" />
+            </div>
+            <div class="calc-row">
+              <div class="calc-field">
+                <label for="calc-finish">Paint Finish</label>
+                <select id="calc-finish">
+                  <option value="400">Flat / Matte</option>
+                  <option value="375" selected>Eggshell / Satin</option>
+                  <option value="350">Semi-Gloss</option>
+                </select>
+              </div>
+              <div class="calc-field">
+                <label>Coats</label>
+                <div class="calc-coats" role="group" aria-label="Number of coats">
+                  <button type="button" class="coat-btn" data-coats="1">1</button>
+                  <button type="button" class="coat-btn active" data-coats="2">2</button>
+                  <button type="button" class="coat-btn" data-coats="3">3</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="calc-result">
+            <span id="calc-gallons">1.5</span>
+            <span class="calc-gallons-label">Gallons Needed</span>
+          </div>
+        </div>
+        <p class="calc-disclaimer" data-animate data-animate-delay="1">Estimate only — actual material needs vary by surface porosity and application method. Our estimators confirm exact quantities on-site.</p>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- ===== WARRANTY ===== -->
+    <section id="warranty" class="section section-alt">
+      <div class="container">
+        <div class="section-heading" data-animate>
+          <p class="section-eyebrow">Our Promise</p>
+          <h2>3-Year Workmanship Warranty</h2>
+          <div class="gold-rule"></div>
+          <p class="section-desc">Every project we complete is backed in writing — no cost, no hassle if something's off.</p>
+        </div>
+        <div class="warranty-grid">
+          <div class="warranty-badge-wrap" data-animate>
+            <div class="warranty-badge">
+              <span class="warranty-badge-num">3</span>
+              <span class="warranty-badge-label">Year<br />Warranty</span>
+            </div>
+            <a href="assets/documents/Ameen-Painting-3-Year-Warranty.pdf" download class="btn btn-outline btn-sm warranty-download-btn">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M8 2v8m0 0l-3-3m3 3l3-3M3 13h10"/></svg>
+              Download Warranty (PDF)
+            </a>
+          </div>
+          <div class="warranty-content">
+            <div class="section-heading align-left" data-animate data-animate-delay="1">
+              <p class="section-eyebrow">The Details</p>
+              <h3>What's Covered</h3>
+              <div class="gold-rule"></div>
+            </div>
+            <p data-animate data-animate-delay="2">
+              Ameen Painting LLC provides a three-year warranty on all workmanship performed. This warranty covers peeling, bubbling, cracking, or splitting caused by improper surface preparation or improper application of coatings. If a covered issue arises, a member of our team will return to repair and touch up the affected area at no cost. This warranty is valid for three years from the completion date of the project and is transferable to a new owner or tenant.
+            </p>
+            <p data-animate data-animate-delay="3">
+              <strong>Exclusions:</strong> This warranty does not cover damage caused by normal wear and tear, moisture intrusion, structural movement or settling, HVAC or humidity-related issues, accidental or third-party damage, vandalism, or paint failure caused by pre-existing substrate conditions such as rotted wood, prior coating failures, or surface defects not disclosed before work began.
+            </p>
+          </div>
+        </div>
+        <div class="faq-list" data-animate data-animate-delay="1">
+          <details class="warranty-details">
+            <summary>Is Ameen Painting LLC licensed and insured?</summary>
+            <div class="warranty-terms-body">
+              <p>Yes. We're a licensed and insured painting contractor serving San Antonio, TX and the surrounding area.</p>
+            </div>
+          </details>
+          <details class="warranty-details">
+            <summary>How long does the warranty last?</summary>
+            <div class="warranty-terms-body">
+              <p>Three years from the completion date of your project, and it's transferable if you sell the property or the space changes tenants.</p>
+            </div>
+          </details>
+          <details class="warranty-details">
+            <summary>Do you offer free estimates?</summary>
+            <div class="warranty-terms-body">
+              <p>Yes — every project starts with a free, no-obligation estimate. Request one through our quote form or by phone.</p>
+            </div>
+          </details>
+          <details class="warranty-details">
+            <summary>How soon can you start?</summary>
+            <div class="warranty-terms-body">
+              <p>Timelines depend on current scheduling and project size — reach out with your timeline and we'll let you know what's realistic.</p>
+            </div>
+          </details>
         </div>
       </div>
     </section>
@@ -377,11 +562,49 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             <h3>Request a Free Quote</h3>
             <p>Tell us about your project — scope, location, timeline, and any special requirements. We'll review and follow up promptly.</p>
-            <a href="https://forms.gle/6kuEJF3T7V3bLef3A" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">
-              Open Quote Request Form
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M7 3h6v6M13 3L6 10"/><path d="M3 5H1v10h10v-2"/></svg>
-            </a>
-            <p class="quote-cta-note">Opens in a new tab &mdash; takes about 2 minutes to complete.</p>
+            <form id="quote-form" class="quote-form" novalidate>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="qf-name">Name</label>
+                  <input type="text" id="qf-name" name="name" autocomplete="name" required />
+                </div>
+                <div class="form-field">
+                  <label for="qf-phone">Phone</label>
+                  <input type="tel" id="qf-phone" name="phone" autocomplete="tel" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="qf-email">Email</label>
+                  <input type="email" id="qf-email" name="email" autocomplete="email" required />
+                </div>
+                <div class="form-field">
+                  <label for="qf-address">Property Address</label>
+                  <input type="text" id="qf-address" name="address" autocomplete="street-address" />
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="qf-project-type">Project Type</label>
+                <select id="qf-project-type" name="projectType" required>
+                  <option value="" disabled selected>Select a project type</option>
+                  <option>Interior Painting</option>
+                  <option>Exterior Painting</option>
+                  <option>Cabinet Refinishing</option>
+                  <option>Drywall Repair</option>
+                  <option>Commercial &amp; Tenant Improvement</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="qf-details">Project Details</label>
+                <textarea id="qf-details" name="details" rows="4" placeholder="Rooms, square footage, timeline — anything that helps us scope your project."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">
+                Request a Free Quote
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M7 3h6v6M13 3L6 10"/><path d="M3 5H1v10h10v-2"/></svg>
+              </button>
+              <p class="form-status" id="qf-status" role="status" aria-live="polite"></p>
+            </form>
           </div>
         </div>
       </div>
@@ -403,9 +626,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <ul>
             <li><a href="#hero">Home</a></li>
             <li><a href="#services">Services</a></li>
-            <li><a href="pricing.html">Pricing</a></li>
             <li><a href="portfolio.html">Portfolio</a></li>
-            <li><a href="warranty.html">Warranty</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#warranty">Warranty</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
@@ -413,10 +636,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="footer-services">
           <h4>Services</h4>
           <ul>
-            <li>Tenant Improvement</li>
-            <li>Commercial Repaints</li>
-            <li>Exterior Refreshes</li>
-            <li>Punch-list &amp; Support</li>
+            <li>Interior Painting</li>
+            <li>Exterior Painting</li>
+            <li>Cabinet Refinishing</li>
+            <li>Commercial &amp; Tenant Improvement</li>
           </ul>
         </div>
         <div class="footer-contact">
@@ -424,7 +647,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <p><a href="tel:+12108020818">(210) 802-0818</a></p>
           <p><a href="mailto:ameenpaintingteam@gmail.com">ameenpaintingteam@gmail.com</a></p>
           <p>San Antonio, TX &amp; Surrounding Areas</p>
-          <a href="https://forms.gle/6kuEJF3T7V3bLef3A" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">Get a Quote</a>
+          <a href="#contact" class="btn btn-outline btn-sm">Get a Quote</a>
         </div>
       </div>
       <div class="footer-bottom">

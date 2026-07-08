@@ -3,30 +3,32 @@
 /* ============================================================
    PORTFOLIO IMAGES
    Categories: before | after
+   Project: the job each photo belongs to — new projects added
+   later automatically get their own filter chip (see initPortfolio).
    ============================================================ */
 const portfolioImages = [
   // BEFORE
-  { src: 'assets/images/hollister-before-01.webp', label: 'Hollister — Priming Phase',       category: 'before' },
-  { src: 'assets/images/hollister-before-02.webp', label: 'Hollister — In Progress',          category: 'before' },
-  { src: 'assets/images/hollister-before-03.webp', label: 'Hollister — In Progress',          category: 'before' },
-  { src: 'assets/images/hollister-before-04.webp', label: 'Hollister — Three-Coat Process',   category: 'before' },
+  { src: 'assets/images/hollister-before-01.webp', label: 'Hollister — Priming Phase',       category: 'before', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-before-02.webp', label: 'Hollister — In Progress',          category: 'before', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-before-03.webp', label: 'Hollister — In Progress',          category: 'before', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-before-04.webp', label: 'Hollister — Three-Coat Process',   category: 'before', project: 'Hollister Retail' },
   // AFTER
-  { src: 'assets/images/hollister-after-01.webp',  label: 'Hollister — Completed',            category: 'after' },
-  { src: 'assets/images/hollister-after-02.webp',  label: 'Hollister — Completed',            category: 'after' },
-  { src: 'assets/images/hollister-after-03.webp',  label: 'Hollister — Completed',            category: 'after' },
-  { src: 'assets/images/hollister-after-04.webp',  label: 'Hollister — Completed',            category: 'after' },
-  { src: 'assets/images/hollister-after-05.webp',  label: 'Hollister — Completed',            category: 'after' },
-  { src: 'assets/images/hollister-after-06.webp',  label: 'Hollister — Completed',            category: 'after' },
-  { src: 'assets/images/hollister-after-07.webp',  label: 'Hollister — Completed',            category: 'after' },
-  { src: 'assets/images/hollister-after-08.webp',  label: 'Hollister — Completed',            category: 'after' },
-  { src: 'assets/images/hollister-after-09.webp',  label: 'Hollister — Completed',            category: 'after' },
-  { src: 'assets/images/hollister-after-10.webp',  label: 'Hollister — Final Result',         category: 'after' },
-  { src: 'assets/images/hollister-after-11.webp',  label: 'Hollister — Final Result',         category: 'after' },
-  { src: 'assets/images/hollister-after-12.webp',  label: 'Hollister — Final Result',         category: 'after' },
-  { src: 'assets/images/hollister-after-13.webp',  label: 'Hollister — Final Result',         category: 'after' },
-  { src: 'assets/images/hollister-after-14.webp',  label: 'Hollister — Premium Finish',       category: 'after' },
-  { src: 'assets/images/hollister-after-15.webp',  label: 'Hollister — Flawless Result',      category: 'after' },
-  { src: 'assets/images/hollister-after-16.webp',  label: 'Hollister — Showroom Quality',     category: 'after' },
+  { src: 'assets/images/hollister-after-01.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-02.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-03.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-04.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-05.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-06.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-07.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-08.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-09.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-10.webp',  label: 'Hollister — Final Result',         category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-11.webp',  label: 'Hollister — Final Result',         category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-12.webp',  label: 'Hollister — Final Result',         category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-13.webp',  label: 'Hollister — Final Result',         category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-14.webp',  label: 'Hollister — Premium Finish',       category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-15.webp',  label: 'Hollister — Flawless Result',      category: 'after', project: 'Hollister Retail' },
+  { src: 'assets/images/hollister-after-16.webp',  label: 'Hollister — Showroom Quality',     category: 'after', project: 'Hollister Retail' },
 ];
 
 /* ============================================================
@@ -157,6 +159,37 @@ function initCounters() {
 }
 
 /* ============================================================
+   SERVICES ACCORDION
+   ============================================================ */
+function initServicesAccordion() {
+  const items = document.querySelectorAll('.accordion-item');
+  if (!items.length) return;
+
+  items.forEach(item => {
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
+    item.setAttribute('aria-expanded', item.classList.contains('is-active') ? 'true' : 'false');
+
+    const activate = () => {
+      items.forEach(i => {
+        i.classList.remove('is-active');
+        i.setAttribute('aria-expanded', 'false');
+      });
+      item.classList.add('is-active');
+      item.setAttribute('aria-expanded', 'true');
+    };
+
+    item.addEventListener('click', activate);
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        activate();
+      }
+    });
+  });
+}
+
+/* ============================================================
    PORTFOLIO GRID + FILTER
    ============================================================ */
 function initPortfolio() {
@@ -167,6 +200,7 @@ function initPortfolio() {
     const figure = document.createElement('figure');
     figure.className = 'portfolio-item';
     figure.dataset.category = img.category;
+    figure.dataset.project = img.project;
     figure.dataset.index = index;
     figure.setAttribute('data-animate', '');
 
@@ -195,22 +229,52 @@ function initPortfolio() {
   // Re-trigger animations for dynamically added items
   initScrollAnimations();
 
-  // Filter
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+  // Build the "By Project" filter row from whatever distinct projects are
+  // present — dropping a new project's photos into portfolioImages later
+  // gives it a filter chip automatically, no markup changes needed.
+  const projectFilterRow = document.getElementById('portfolio-project-filters');
+  if (projectFilterRow) {
+    const projects = [...new Set(portfolioImages.map(img => img.project))];
+    projects.forEach(project => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.type = 'button';
+      btn.dataset.projectFilter = project;
+      btn.textContent = project;
+      projectFilterRow.appendChild(btn);
+    });
+  }
 
-      const filter = btn.dataset.filter;
-      document.querySelectorAll('.portfolio-item').forEach(item => {
-        if (filter === 'all' || item.dataset.category === filter) {
-          item.style.display = '';
-        } else {
-          item.style.display = 'none';
-        }
-      });
+  let activeCategory = 'all';
+  let activeProject = 'all';
+
+  const applyFilters = () => {
+    document.querySelectorAll('.portfolio-item').forEach(item => {
+      const matchesCategory = activeCategory === 'all' || item.dataset.category === activeCategory;
+      const matchesProject = activeProject === 'all' || item.dataset.project === activeProject;
+      item.style.display = matchesCategory && matchesProject ? '' : 'none';
+    });
+  };
+
+  document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = btn.dataset.filter;
+      applyFilters();
     });
   });
+
+  if (projectFilterRow) {
+    projectFilterRow.addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn[data-project-filter]');
+      if (!btn) return;
+      projectFilterRow.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeProject = btn.dataset.projectFilter;
+      applyFilters();
+    });
+  }
 }
 
 /* ============================================================
@@ -326,6 +390,69 @@ function initCalculator() {
 }
 
 /* ============================================================
+   QUOTE FORM
+   No backend yet, so a valid submission is handed off to the
+   owner's own mail client via a prefilled mailto: link. Swap this
+   for a real POST once a Cloudflare Pages Function is in place.
+   ============================================================ */
+function initQuoteForm() {
+  const form = document.getElementById('quote-form');
+  if (!form) return;
+  const status = document.getElementById('qf-status');
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phonePattern = /^[0-9()+\-.\s]{7,}$/;
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    form.querySelectorAll('.form-field').forEach(f => f.classList.remove('has-error'));
+    status.textContent = '';
+    status.className = 'form-status';
+
+    const name        = form.name.value.trim();
+    const phone       = form.phone.value.trim();
+    const email       = form.email.value.trim();
+    const address     = form.address.value.trim();
+    const projectType = form.projectType.value;
+    const details     = form.details.value.trim();
+
+    let firstInvalidField = null;
+    const markError = fieldName => {
+      const field = form.elements[fieldName].closest('.form-field');
+      field.classList.add('has-error');
+      if (!firstInvalidField) firstInvalidField = field;
+    };
+
+    if (!name) markError('name');
+    if (!phonePattern.test(phone)) markError('phone');
+    if (!emailPattern.test(email)) markError('email');
+    if (!projectType) markError('projectType');
+
+    if (firstInvalidField) {
+      status.textContent = 'Please fill in the highlighted fields correctly.';
+      status.classList.add('error');
+      firstInvalidField.querySelector('input, select, textarea').focus();
+      return;
+    }
+
+    const subject = `New Quote Request — ${name}`;
+    const body = [
+      `Name: ${name}`,
+      `Phone: ${phone}`,
+      `Email: ${email}`,
+      address ? `Property Address: ${address}` : null,
+      `Project Type: ${projectType}`,
+      details ? `Project Details: ${details}` : null,
+    ].filter(Boolean).join('\n');
+
+    status.textContent = 'Opening your email app to send this request…';
+    status.classList.add('success');
+    window.location.href = `mailto:ameenpaintingteam@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+}
+
+/* ============================================================
    HERO PARALLAX TRIGGER
    ============================================================ */
 function initHero() {
@@ -353,9 +480,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initActiveNav();
   initScrollAnimations();
   initCounters();
+  initServicesAccordion();
   initPortfolio();
   initLightbox();
   initCalculator();
+  initQuoteForm();
   initHero();
   initFooterYear();
 });

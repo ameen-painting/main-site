@@ -67,12 +67,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <ul class="nav-list">
           <li><a href="index.html" class="nav-link">Home</a></li>
           <li><a href="index.html#services" class="nav-link">Services</a></li>
-          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
           <li><a href="portfolio.html" class="nav-link active">Portfolio</a></li>
-          <li><a href="warranty.html" class="nav-link">Warranty</a></li>
+          <li><a href="index.html#pricing" class="nav-link">Pricing</a></li>
+          <li><a href="index.html#warranty" class="nav-link">Warranty</a></li>
           <li><a href="index.html#about" class="nav-link">About</a></li>
           <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-          <li><a href="https://forms.gle/6kuEJF3T7V3bLef3A" target="_blank" rel="noopener noreferrer" class="nav-link nav-cta">Get a Quote</a></li>
+          <li><a href="index.html#contact" class="nav-link nav-cta">Get a Quote</a></li>
         </ul>
       </nav>
       <button id="hamburger" class="hamburger" aria-label="Toggle menu" aria-expanded="false">
@@ -96,9 +96,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section id="portfolio" class="section">
       <div class="container">
         <div class="portfolio-filters" data-animate>
-          <button class="filter-btn active" data-filter="all">All Projects</button>
+          <button class="filter-btn active" data-filter="all">All Photos</button>
           <button class="filter-btn" data-filter="before">Before</button>
           <button class="filter-btn" data-filter="after">After</button>
+        </div>
+        <div class="portfolio-filters portfolio-filters-project" id="portfolio-project-filters" data-animate>
+          <button class="filter-btn active" data-project-filter="all">All Projects</button>
+          <!-- Per-project chips populated by JS -->
         </div>
         <div class="portfolio-grid" id="portfolio-grid">
           <!-- Populated by JS -->
@@ -133,7 +137,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
           <h3>Like What You See?</h3>
           <p>Tell us about your project and we'll follow up with a free, no-obligation estimate.</p>
-          <a href="https://forms.gle/6kuEJF3T7V3bLef3A" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          <a href="index.html#contact" class="btn btn-primary">
             Request a Free Quote
           </a>
         </div>
@@ -156,9 +160,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="index.html#services">Services</a></li>
-            <li><a href="pricing.html">Pricing</a></li>
             <li><a href="portfolio.html">Portfolio</a></li>
-            <li><a href="warranty.html">Warranty</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+            <li><a href="index.html#warranty">Warranty</a></li>
             <li><a href="index.html#about">About</a></li>
             <li><a href="index.html#contact">Contact</a></li>
           </ul>
@@ -166,10 +170,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="footer-services">
           <h4>Services</h4>
           <ul>
-            <li>Tenant Improvement</li>
-            <li>Commercial Repaints</li>
-            <li>Exterior Refreshes</li>
-            <li>Punch-list &amp; Support</li>
+            <li>Interior Painting</li>
+            <li>Exterior Painting</li>
+            <li>Cabinet Refinishing</li>
+            <li>Commercial &amp; Tenant Improvement</li>
           </ul>
         </div>
         <div class="footer-contact">
@@ -177,7 +181,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <p><a href="tel:+12108020818">(210) 802-0818</a></p>
           <p><a href="mailto:ameenpaintingteam@gmail.com">ameenpaintingteam@gmail.com</a></p>
           <p>San Antonio, TX &amp; Surrounding Areas</p>
-          <a href="https://forms.gle/6kuEJF3T7V3bLef3A" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">Get a Quote</a>
+          <a href="index.html#contact" class="btn btn-outline btn-sm">Get a Quote</a>
         </div>
       </div>
       <div class="footer-bottom">
