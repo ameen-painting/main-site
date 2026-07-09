@@ -449,20 +449,41 @@ function initQuoteModal() {
   const closeBtn = document.getElementById('quote-modal-close');
   let lastFocused = null;
   let hideTimer = null;
+  let lockedScrollY = 0;
+
+  // iOS Safari doesn't reliably honor `overflow: hidden` on the body to
+  // stop background scroll/touch-scroll, so pin it with position:fixed
+  // instead and restore the scroll position on close.
+  const lockBodyScroll = () => {
+    lockedScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${lockedScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+  };
+  const unlockBodyScroll = () => {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    window.scrollTo(0, lockedScrollY);
+  };
 
   const openModal = () => {
     clearTimeout(hideTimer);
     lastFocused = document.activeElement;
     modal.hidden = false;
-    document.body.style.overflow = 'hidden';
+    lockBodyScroll();
     requestAnimationFrame(() => modal.classList.add('is-open'));
     const firstField = modal.querySelector('input, select, textarea');
-    if (firstField) firstField.focus();
+    // preventScroll stops the browser from also scrolling the (now
+    // fixed) background page into "view" of the focused field.
+    if (firstField) firstField.focus({ preventScroll: true });
   };
 
   const closeModal = () => {
     modal.classList.remove('is-open');
-    document.body.style.overflow = '';
+    unlockBodyScroll();
     hideTimer = setTimeout(() => { modal.hidden = true; }, 250);
     if (lastFocused && lastFocused.focus) lastFocused.focus();
   };
