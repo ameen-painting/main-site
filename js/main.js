@@ -159,6 +159,57 @@ function initCounters() {
 }
 
 /* ============================================================
+   BEFORE / AFTER DRAG SLIDER
+   ============================================================ */
+function initBeforeAfterSliders() {
+  document.querySelectorAll('.ba-slider').forEach(slider => {
+    const grip = slider.querySelector('.ba-slider-handle-grip');
+    let pct = 50;
+
+    const apply = () => {
+      slider.style.setProperty('--pos', pct + '%');
+      grip.setAttribute('aria-valuenow', String(Math.round(pct)));
+    };
+
+    const fromClientX = clientX => {
+      const rect = slider.getBoundingClientRect();
+      pct = Math.min(97, Math.max(3, ((clientX - rect.left) / rect.width) * 100));
+      apply();
+    };
+
+    let dragging = false;
+    slider.addEventListener('pointerdown', e => {
+      dragging = true;
+      slider.classList.add('is-dragging');
+      slider.setPointerCapture(e.pointerId);
+      fromClientX(e.clientX);
+    });
+    slider.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      fromClientX(e.clientX);
+    });
+    const stopDrag = () => {
+      dragging = false;
+      slider.classList.remove('is-dragging');
+    };
+    slider.addEventListener('pointerup', stopDrag);
+    slider.addEventListener('pointercancel', stopDrag);
+
+    grip.setAttribute('role', 'slider');
+    grip.setAttribute('tabindex', '0');
+    grip.setAttribute('aria-valuemin', '0');
+    grip.setAttribute('aria-valuemax', '100');
+    grip.setAttribute('aria-label', 'Drag to compare before and after photos');
+    grip.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft')  { pct = Math.max(3, pct - 4); apply(); e.preventDefault(); }
+      if (e.key === 'ArrowRight') { pct = Math.min(97, pct + 4); apply(); e.preventDefault(); }
+    });
+
+    apply();
+  });
+}
+
+/* ============================================================
    SERVICES ACCORDION
    ============================================================ */
 function initServicesAccordion() {
@@ -390,6 +441,49 @@ function initCalculator() {
 }
 
 /* ============================================================
+   QUOTE MODAL
+   ============================================================ */
+function initQuoteModal() {
+  const modal = document.getElementById('quote-modal');
+  if (!modal) return;
+  const closeBtn = document.getElementById('quote-modal-close');
+  let lastFocused = null;
+  let hideTimer = null;
+
+  const openModal = () => {
+    clearTimeout(hideTimer);
+    lastFocused = document.activeElement;
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => modal.classList.add('is-open'));
+    const firstField = modal.querySelector('input, select, textarea');
+    if (firstField) firstField.focus();
+  };
+
+  const closeModal = () => {
+    modal.classList.remove('is-open');
+    document.body.style.overflow = '';
+    hideTimer = setTimeout(() => { modal.hidden = true; }, 250);
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+  };
+
+  document.querySelectorAll('.js-open-quote').forEach(trigger => {
+    trigger.addEventListener('click', e => {
+      e.preventDefault();
+      openModal();
+    });
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !modal.hidden) closeModal();
+  });
+}
+
+/* ============================================================
    QUOTE FORM
    No backend yet, so a valid submission is handed off to the
    owner's own mail client via a prefilled mailto: link. Swap this
@@ -463,6 +557,24 @@ function initHero() {
 }
 
 /* ============================================================
+   SCROLL TO TOP
+   ============================================================ */
+function initScrollTop() {
+  const btn = document.getElementById('scroll-top-btn');
+  if (!btn) return;
+
+  const onScroll = () => {
+    btn.classList.toggle('is-visible', window.scrollY > 600);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/* ============================================================
    FOOTER YEAR
    ============================================================ */
 function initFooterYear() {
@@ -481,10 +593,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   initCounters();
   initServicesAccordion();
+  initBeforeAfterSliders();
   initPortfolio();
   initLightbox();
   initCalculator();
+  initQuoteModal();
   initQuoteForm();
   initHero();
   initFooterYear();
+  initScrollTop();
 });

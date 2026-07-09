@@ -72,7 +72,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <li><a href="index.html#warranty" class="nav-link">Warranty</a></li>
           <li><a href="index.html#about" class="nav-link">About</a></li>
           <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-          <li><a href="index.html#contact" class="nav-link nav-cta">Get a Quote</a></li>
+          <li><a href="index.html#contact" class="nav-link nav-cta js-open-quote">Get a Quote</a></li>
         </ul>
       </nav>
       <button id="hamburger" class="hamburger" aria-label="Toggle menu" aria-expanded="false">
@@ -137,7 +137,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
           <h3>Like What You See?</h3>
           <p>Tell us about your project and we'll follow up with a free, no-obligation estimate.</p>
-          <a href="index.html#contact" class="btn btn-primary">
+          <a href="index.html#contact" class="btn btn-primary js-open-quote">
             Request a Free Quote
           </a>
         </div>
@@ -181,7 +181,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <p><a href="tel:+12108020818">(210) 802-0818</a></p>
           <p><a href="mailto:ameenpaintingteam@gmail.com">ameenpaintingteam@gmail.com</a></p>
           <p>San Antonio, TX &amp; Surrounding Areas</p>
-          <a href="index.html#contact" class="btn btn-outline btn-sm">Get a Quote</a>
+          <a href="index.html#contact" class="btn btn-outline btn-sm js-open-quote">Get a Quote</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -189,6 +189,71 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
     </div>
   </footer>
+
+  <button id="scroll-top-btn" class="scroll-top-btn" aria-label="Scroll to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
+
+  <!-- ===== QUOTE MODAL ===== -->
+  <div id="quote-modal" class="modal-overlay" hidden>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="quote-modal-title">
+      <button type="button" class="modal-close" id="quote-modal-close" aria-label="Close">&times;</button>
+      <div class="quote-cta-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="8" width="36" height="32" rx="3" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M6 18h36" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M14 28h12M14 34h8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="38" cy="12" r="6" fill="var(--accent)"/>
+          <path d="M35 12l2 2 4-4" stroke="#0C1C0C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3 id="quote-modal-title">Request a Free Quote</h3>
+      <p>Tell us about your project — scope, location, timeline, and any special requirements. We'll review and follow up promptly.</p>
+      <form id="quote-form" class="quote-form" novalidate>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="qf-name">Name</label>
+            <input type="text" id="qf-name" name="name" autocomplete="name" required />
+          </div>
+          <div class="form-field">
+            <label for="qf-phone">Phone</label>
+            <input type="tel" id="qf-phone" name="phone" autocomplete="tel" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="qf-email">Email</label>
+            <input type="email" id="qf-email" name="email" autocomplete="email" required />
+          </div>
+          <div class="form-field">
+            <label for="qf-address">Property Address</label>
+            <input type="text" id="qf-address" name="address" autocomplete="street-address" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="qf-project-type">Project Type</label>
+          <select id="qf-project-type" name="projectType" required>
+            <option value="" disabled selected>Select a project type</option>
+            <option>Interior Painting</option>
+            <option>Exterior Painting</option>
+            <option>Cabinet Refinishing</option>
+            <option>Drywall Repair</option>
+            <option>Commercial &amp; Tenant Improvement</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="qf-details">Project Details</label>
+          <textarea id="qf-details" name="details" rows="4" placeholder="Rooms, square footage, timeline — anything that helps us scope your project."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">
+          Request a Free Quote
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M7 3h6v6M13 3L6 10"/><path d="M3 5H1v10h10v-2"/></svg>
+        </button>
+        <p class="form-status" id="qf-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
 
   <script src="js/main.js"></script>
 </body>
