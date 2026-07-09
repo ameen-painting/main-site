@@ -929,10 +929,10 @@ section[id] { scroll-margin-top: 90px; }
 /* ---- 8a. BEFORE/AFTER SLIDER ---- */
 .ba-slider {
   position: relative;
-  max-width: 880px;
+  max-width: 560px;
   margin: 0 auto;
-  aspect-ratio: 4 / 3;
-  max-height: 600px;
+  aspect-ratio: 3 / 4;
+  max-height: 680px;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border);
@@ -942,7 +942,7 @@ section[id] { scroll-margin-top: 90px; }
   touch-action: none;
 }
 .ba-slider-image { position: absolute; inset: 0; }
-.ba-slider-image img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.ba-slider-image img { width: 100%; height: 100%; object-fit: cover; object-position: center 18%; display: block; pointer-events: none; }
 .ba-slider-after { clip-path: inset(0 0 0 var(--pos)); }
 .ba-tag {
   position: absolute;
@@ -1006,7 +1006,7 @@ section[id] { scroll-margin-top: 90px; }
 }
 
 @media (max-width: 640px) {
-  .ba-slider { aspect-ratio: 3 / 4; }
+  .ba-slider { max-width: 100%; }
 }
 .portfolio-item img {
   width: 100%;
