@@ -346,7 +346,7 @@ section[id] { scroll-margin-top: 90px; }
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url('../assets/images/house-ext-after.PNG');
+  background-image: url('../assets/images/hollister-hero.webp');
   background-size: cover;
   background-position: center;
   transform: scale(1.04);
