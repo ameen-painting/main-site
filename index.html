@@ -636,62 +636,77 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div id="quote-modal" class="modal-overlay" hidden>
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="quote-modal-title">
       <button type="button" class="modal-close" id="quote-modal-close" aria-label="Close">&times;</button>
-      <div class="quote-cta-icon" aria-hidden="true">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="6" y="8" width="36" height="32" rx="3" stroke="currentColor" stroke-width="2.5"/>
-          <path d="M6 18h36" stroke="currentColor" stroke-width="2.5"/>
-          <path d="M14 28h12M14 34h8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="38" cy="12" r="6" fill="var(--accent)"/>
-          <path d="M35 12l2 2 4-4" stroke="#0C1C0C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+      <div id="quote-form-view" class="quote-modal-view">
+        <div class="quote-cta-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="8" width="36" height="32" rx="3" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M6 18h36" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M14 28h12M14 34h8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="38" cy="12" r="6" fill="var(--accent)"/>
+            <path d="M35 12l2 2 4-4" stroke="#0C1C0C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 id="quote-modal-title">Request a Free Quote</h3>
+        <p>Tell us about your project — scope, location, timeline, and any special requirements. We'll review and follow up promptly.</p>
+        <form id="quote-form" class="quote-form" novalidate>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="qf-name">Name</label>
+              <input type="text" id="qf-name" name="name" autocomplete="name" required />
+            </div>
+            <div class="form-field">
+              <label for="qf-phone">Phone</label>
+              <input type="tel" id="qf-phone" name="phone" autocomplete="tel" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="qf-email">Email</label>
+              <input type="email" id="qf-email" name="email" autocomplete="email" required />
+            </div>
+            <div class="form-field">
+              <label for="qf-address">Property Address</label>
+              <input type="text" id="qf-address" name="address" autocomplete="street-address" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="qf-project-type">Project Type</label>
+            <select id="qf-project-type" name="projectType" required>
+              <option value="" disabled selected>Select a project type</option>
+              <option>Residential Interior</option>
+              <option>Residential Exterior</option>
+              <option>Cabinet Refining &amp; Painting</option>
+              <option>General Commercial Interior</option>
+              <option>General Commercial Exterior</option>
+              <option>Retail / Restaurant / Office Space</option>
+              <option>TI - Tenant Improvements</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="qf-details">Project Details</label>
+            <textarea id="qf-details" name="details" rows="4" placeholder="Rooms, square footage, timeline — anything that helps us scope your project."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            Request a Free Quote
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M7 3h6v6M13 3L6 10"/><path d="M3 5H1v10h10v-2"/></svg>
+          </button>
+          <p class="form-status" id="qf-status" role="status" aria-live="polite"></p>
+        </form>
       </div>
-      <h3 id="quote-modal-title">Request a Free Quote</h3>
-      <p>Tell us about your project — scope, location, timeline, and any special requirements. We'll review and follow up promptly.</p>
-      <form id="quote-form" class="quote-form" novalidate>
-        <div class="form-row">
-          <div class="form-field">
-            <label for="qf-name">Name</label>
-            <input type="text" id="qf-name" name="name" autocomplete="name" required />
-          </div>
-          <div class="form-field">
-            <label for="qf-phone">Phone</label>
-            <input type="tel" id="qf-phone" name="phone" autocomplete="tel" required />
-          </div>
+      <div id="quote-success-view" class="quote-modal-view quote-success" hidden>
+        <div class="quote-success-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="21" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M15 24.5l6 6 12-13" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="form-row">
-          <div class="form-field">
-            <label for="qf-email">Email</label>
-            <input type="email" id="qf-email" name="email" autocomplete="email" required />
-          </div>
-          <div class="form-field">
-            <label for="qf-address">Property Address</label>
-            <input type="text" id="qf-address" name="address" autocomplete="street-address" />
-          </div>
-        </div>
-        <div class="form-field">
-          <label for="qf-project-type">Project Type</label>
-          <select id="qf-project-type" name="projectType" required>
-            <option value="" disabled selected>Select a project type</option>
-            <option>Residential Interior</option>
-            <option>Residential Exterior</option>
-            <option>Cabinet Refining &amp; Painting</option>
-            <option>General Commercial Interior</option>
-            <option>General Commercial Exterior</option>
-            <option>Retail / Restaurant / Office Space</option>
-            <option>TI - Tenant Improvements</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label for="qf-details">Project Details</label>
-          <textarea id="qf-details" name="details" rows="4" placeholder="Rooms, square footage, timeline — anything that helps us scope your project."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">
-          Request a Free Quote
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px"><path d="M7 3h6v6M13 3L6 10"/><path d="M3 5H1v10h10v-2"/></svg>
+        <h3 tabindex="-1">Thank You!</h3>
+        <p>Your quote request has been sent. We'll review your project details and follow up within 24 hours.</p>
+        <button type="button" class="btn btn-primary btn-full" id="quote-success-close">
+          Done
         </button>
-        <p class="form-status" id="qf-status" role="status" aria-live="polite"></p>
-      </form>
+      </div>
     </div>
   </div>
 

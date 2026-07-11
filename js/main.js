@@ -447,9 +447,25 @@ function initQuoteModal() {
   const modal = document.getElementById('quote-modal');
   if (!modal) return;
   const closeBtn = document.getElementById('quote-modal-close');
+  const formView = document.getElementById('quote-form-view');
+  const successView = document.getElementById('quote-success-view');
+  const successCloseBtn = document.getElementById('quote-success-close');
   let lastFocused = null;
   let hideTimer = null;
   let lockedScrollY = 0;
+
+  const showSuccessView = () => {
+    if (formView) formView.hidden = true;
+    if (successView) {
+      successView.hidden = false;
+      successView.querySelector('h3')?.focus?.();
+    }
+  };
+  const showFormView = () => {
+    if (successView) successView.hidden = true;
+    if (formView) formView.hidden = false;
+  };
+  modal.showSuccessView = showSuccessView;
 
   // iOS Safari doesn't reliably honor `overflow: hidden` on the body to
   // stop background scroll/touch-scroll, so pin it with position:fixed
@@ -475,7 +491,9 @@ function initQuoteModal() {
     modal.hidden = false;
     lockBodyScroll();
     requestAnimationFrame(() => modal.classList.add('is-open'));
-    const firstField = modal.querySelector('input, select, textarea');
+    const firstField = formView && !formView.hidden
+      ? formView.querySelector('input, select, textarea')
+      : successView?.querySelector('h3, button');
     // preventScroll stops the browser from also scrolling the (now
     // fixed) background page into "view" of the focused field.
     if (firstField) firstField.focus({ preventScroll: true });
@@ -484,7 +502,7 @@ function initQuoteModal() {
   const closeModal = () => {
     modal.classList.remove('is-open');
     unlockBodyScroll();
-    hideTimer = setTimeout(() => { modal.hidden = true; }, 250);
+    hideTimer = setTimeout(() => { modal.hidden = true; showFormView(); }, 250);
     if (lastFocused && lastFocused.focus) lastFocused.focus();
   };
 
@@ -496,6 +514,7 @@ function initQuoteModal() {
   });
 
   closeBtn.addEventListener('click', closeModal);
+  successCloseBtn?.addEventListener('click', closeModal);
   modal.addEventListener('click', e => {
     if (e.target === modal) closeModal();
   });
@@ -574,9 +593,14 @@ function initQuoteForm() {
       if (!response.ok) {
         throw new Error(data.error || 'Failed to send your request. Please try again.');
       }
-      status.textContent = 'Thank you! Your quote request has been sent successfully.';
-      status.classList.add('success');
+      status.textContent = '';
+      status.className = 'form-status';
       form.reset();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnContent;
+      }
+      document.getElementById('quote-modal')?.showSuccessView?.();
     })
     .catch(error => {
       status.textContent = error.message;

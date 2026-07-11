@@ -215,7 +215,7 @@ async function handleQuoteSubmit(request, env) {
         <p>New Website Lead</p>
       </div>
       <div class="email-body">
-        <p class="email-intro">Hi Nikita,</p>
+        <p class="email-intro">Hi Stepan,</p>
         <p class="email-intro">A new free quote request has been submitted. Below are the customer and project details:</p>
         
         <div class="field-card">
