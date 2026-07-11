@@ -551,19 +551,41 @@ function initQuoteForm() {
       return;
     }
 
-    const subject = `New Quote Request — ${name}`;
-    const body = [
-      `Name: ${name}`,
-      `Phone: ${phone}`,
-      `Email: ${email}`,
-      address ? `Property Address: ${address}` : null,
-      `Project Type: ${projectType}`,
-      details ? `Project Details: ${details}` : null,
-    ].filter(Boolean).join('\n');
+    status.textContent = 'Sending your request...';
+    status.className = 'form-status';
 
-    status.textContent = 'Opening your email app to send this request…';
-    status.classList.add('success');
-    window.location.href = `mailto:ameenpaintingteam@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    let originalBtnContent = '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      originalBtnContent = submitBtn.innerHTML;
+      submitBtn.innerHTML = 'Sending...';
+    }
+
+    fetch('/api/submit-quote', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, phone, email, address, projectType, details }),
+    })
+    .then(async response => {
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send your request. Please try again.');
+      }
+      status.textContent = 'Thank you! Your quote request has been sent successfully.';
+      status.classList.add('success');
+      form.reset();
+    })
+    .catch(error => {
+      status.textContent = error.message;
+      status.classList.add('error');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnContent;
+      }
+    });
   });
 }
 
