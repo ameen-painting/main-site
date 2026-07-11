@@ -1654,6 +1654,7 @@ section[id] { scroll-margin-top: 90px; }
   align-items: flex-start;
   gap: 20px;
 }
+.quote-modal-view[hidden] { display: none; }
 
 .quote-success {
   align-items: center;
