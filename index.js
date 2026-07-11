@@ -271,8 +271,8 @@ async function handleQuoteSubmit(request, env) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Ameen Painting Leads <onboarding@resend.dev>',
-        to: ['ameenpaintingteam@gmail.com'],
+        from: 'Ameen Painting Leads <leads@reports.ameenpainting.com>',
+        to: ['nikitatw354@gmail.com'],
         reply_to: email, // Click reply to directly write back to the customer's email
         subject: `New Lead: ${name} (${projectType})`,
         html: htmlContent,
