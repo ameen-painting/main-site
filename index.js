@@ -1,7 +1,19 @@
-export async function onRequestPost(context) {
-  try {
-    const { request, env } = context;
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
 
+    // Route API requests for lead submissions
+    if (url.pathname === '/api/submit-quote' && request.method === 'POST') {
+      return handleQuoteSubmit(request, env);
+    }
+
+    // Fallback: serve static assets directly from binding
+    return env.ASSETS.fetch(request);
+  }
+};
+
+async function handleQuoteSubmit(request, env) {
+  try {
     // 1. Verify Resend API Key
     const resendApiKey = env.RESEND_API_KEY;
     if (!resendApiKey) {
