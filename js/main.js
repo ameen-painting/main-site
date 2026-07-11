@@ -1,35 +1,104 @@
 'use strict';
 
 /* ============================================================
-   PORTFOLIO IMAGES
-   Categories: before | after
-   Project: the job each photo belongs to — new projects added
-   later automatically get their own filter chip (see initPortfolio).
+   PORTFOLIO
+   Work is grouped by project. Each project can carry:
+     - pairs:   before/after image pairs (the transformation)
+     - gallery: standalone "finished" / detail shots
+   `type` drives the filter bar (commercial | residential | fencing).
+   To add work later: drop the images in assets/images and add an
+   entry here — the page rebuilds itself, no markup changes needed.
+   Image paths are relative to assets/images/.
    ============================================================ */
-const portfolioImages = [
-  // BEFORE
-  { src: 'assets/images/hollister-before-01.webp', label: 'Hollister — Priming Phase',       category: 'before', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-before-02.webp', label: 'Hollister — In Progress',          category: 'before', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-before-03.webp', label: 'Hollister — In Progress',          category: 'before', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-before-04.webp', label: 'Hollister — Three-Coat Process',   category: 'before', project: 'Hollister Retail' },
-  // AFTER
-  { src: 'assets/images/hollister-after-01.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-02.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-03.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-04.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-05.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-06.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-07.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-08.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-09.webp',  label: 'Hollister — Completed',            category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-10.webp',  label: 'Hollister — Final Result',         category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-11.webp',  label: 'Hollister — Final Result',         category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-12.webp',  label: 'Hollister — Final Result',         category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-13.webp',  label: 'Hollister — Final Result',         category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-14.webp',  label: 'Hollister — Premium Finish',       category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-15.webp',  label: 'Hollister — Flawless Result',      category: 'after', project: 'Hollister Retail' },
-  { src: 'assets/images/hollister-after-16.webp',  label: 'Hollister — Showroom Quality',     category: 'after', project: 'Hollister Retail' },
+const portfolioProjects = [
+  {
+    id: 'hollister',
+    type: 'commercial',
+    tag: 'Commercial Retail Buildout',
+    name: 'Hollister — Ingram Park Mall',
+    blurb: 'A full interior and storefront finish for a national retailer — custom display millwork, barrel-vault plank ceilings, and a flawless, showroom-ready result.',
+    pairs: [
+      { before: 'hollister-before-01.webp', after: 'hollister-after-01.webp', ratio: 'portrait', caption: 'Custom Display Millwork — primer to finish' },
+      { before: 'hollister-outside-before.webp', after: 'hollister-outside-after.webp', ratio: 'portrait', caption: 'Mall Storefront' },
+    ],
+    gallery: [
+      { src: 'hollister-05.PNG', caption: 'Finished Cashwrap & Sales Floor' },
+      { src: 'hollister-06.webp', caption: 'Completed Interior' },
+      { src: 'wooden-store-window-01.PNG', caption: 'Arched Millwork Detail' },
+      { src: 'wooden-store-window-02.PNG', caption: 'Barrel-Vault Ceiling & Shutters' },
+      { src: 'hollister-01.webp', caption: 'Completed Storefront' },
+      { src: 'hollister-02.webp', caption: 'Ceiling & Wall Finishing' },
+      { src: 'hollister-03.webp', caption: 'Interior Buildout' },
+      { src: 'hollister-04.webp', caption: 'Our Crew at Work' },
+      { src: 'owner-infront-of-hollister.JPG', caption: 'Project Complete' },
+      { src: 'work-in-progress.JPG', caption: 'Prep & Surface Protection' },
+    ],
+  },
+  {
+    id: 'exterior-home',
+    type: 'residential',
+    tag: 'Residential Exterior',
+    name: 'Two-Story Exterior Repaint',
+    blurb: 'Tired, patchy siding brought back to life with a crisp white body, bold charcoal trim, and meticulous detail — right down to the utility boxes.',
+    pairs: [
+      { before: 'house-ext-before.PNG', after: 'house-ext-after.PNG', ratio: 'portrait', caption: 'Full Exterior Transformation' },
+    ],
+    gallery: [
+      { src: 'house-outside-door.JPG', caption: 'Entry, Columns & Trim Detail' },
+      { src: 'house-outside-utills.JPG', caption: 'Utility Boxes Painted to Match' },
+    ],
+  },
+  {
+    id: 'staircase',
+    type: 'residential',
+    tag: 'Residential Interior',
+    name: 'Interior Staircase Refinish',
+    blurb: 'Worn, dated stair treads and railings transformed with a clean, durable painted finish that brightens the whole entry.',
+    pairs: [
+      { before: 'house-stairs-before.webp', after: 'house-stairs-after.webp', ratio: 'portrait', caption: 'Staircase & Railings' },
+    ],
+    gallery: [],
+  },
+  {
+    id: 'garage',
+    type: 'residential',
+    tag: 'Residential Interior',
+    name: 'Garage Interior Makeover',
+    blurb: 'Patched, primed, and rolled to a smooth, uniform charcoal finish — a clean, finished look for an everyday space.',
+    pairs: [
+      { before: 'garage-before.JPG', after: 'garage-after.JPG', ratio: 'landscape', caption: 'Patch, Prime & Finish' },
+    ],
+    gallery: [],
+  },
+  {
+    id: 'fence',
+    type: 'fencing',
+    tag: 'Staining & Sealing',
+    name: 'Fence Restoration',
+    blurb: 'Sun-faded, weathered fencing cleaned and re-stained to a rich, even, protective finish that lasts.',
+    pairs: [
+      { before: 'fence-before-01.JPG', after: 'fence-after-01.JPG', ratio: 'portrait', caption: 'Backyard Privacy Fence' },
+      { before: 'fence-before-02.JPG', after: 'fence-after-02.JPG', ratio: 'portrait', caption: 'Front-Yard Fence' },
+    ],
+    gallery: [],
+  },
+  {
+    id: 'metalwork',
+    type: 'commercial',
+    tag: 'Commercial',
+    name: 'Metalwork & Specialty Finishes',
+    blurb: 'Spray-finished railings and balconies plus hand-troweled specialty wall textures for commercial clients.',
+    pairs: [],
+    gallery: [
+      { src: 'house-side.webp', caption: 'Powder-Finish Railings' },
+      { src: 'balcony.JPG', caption: 'Balcony Railing Unit' },
+      { src: 'wall-close-view.webp', caption: 'Hand-Troweled Wall Texture' },
+    ],
+  },
 ];
+
+// Flat list of every portfolio image, in render order — powers the lightbox.
+let lightboxImages = [];
 
 /* ============================================================
    HEADER — scroll behaviour
@@ -241,91 +310,119 @@ function initServicesAccordion() {
 }
 
 /* ============================================================
-   PORTFOLIO GRID + FILTER
+   PORTFOLIO — project sections + type filter
    ============================================================ */
+const IMG_BASE = 'assets/images/';
+
 function initPortfolio() {
-  const grid = document.getElementById('portfolio-grid');
-  if (!grid) return;
+  const root = document.getElementById('portfolio-root');
+  if (!root) return;
 
-  portfolioImages.forEach((img, index) => {
-    const figure = document.createElement('figure');
-    figure.className = 'portfolio-item';
-    figure.dataset.category = img.category;
-    figure.dataset.project = img.project;
-    figure.dataset.index = index;
-    figure.setAttribute('data-animate', '');
-
-    const tag = document.createElement('span');
-    tag.className = 'cat-tag';
-    tag.textContent = img.category === 'after' ? 'After' : 'Before';
-
-    const image = document.createElement('img');
-    image.src = img.src;
-    image.alt = img.label;
-    image.loading = 'lazy';
-
-    const overlay = document.createElement('div');
-    overlay.className = 'portfolio-item-overlay';
-
-    const caption = document.createElement('p');
-    caption.className = 'portfolio-item-caption';
-    caption.textContent = img.label;
-
-    overlay.appendChild(caption);
-    figure.append(tag, image, overlay);
-    figure.addEventListener('click', () => openLightbox(index));
-    grid.appendChild(figure);
-  });
-
-  // Re-trigger animations for dynamically added items
-  initScrollAnimations();
-
-  // Build the "By Project" filter row from whatever distinct projects are
-  // present — dropping a new project's photos into portfolioImages later
-  // gives it a filter chip automatically, no markup changes needed.
-  const projectFilterRow = document.getElementById('portfolio-project-filters');
-  if (projectFilterRow) {
-    const projects = [...new Set(portfolioImages.map(img => img.project))];
-    projects.forEach(project => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-btn';
-      btn.type = 'button';
-      btn.dataset.projectFilter = project;
-      btn.textContent = project;
-      projectFilterRow.appendChild(btn);
-    });
-  }
-
-  let activeCategory = 'all';
-  let activeProject = 'all';
-
-  const applyFilters = () => {
-    document.querySelectorAll('.portfolio-item').forEach(item => {
-      const matchesCategory = activeCategory === 'all' || item.dataset.category === activeCategory;
-      const matchesProject = activeProject === 'all' || item.dataset.project === activeProject;
-      item.style.display = matchesCategory && matchesProject ? '' : 'none';
-    });
+  lightboxImages = [];
+  // Register an image with the lightbox and return its index.
+  const register = (file, label) => {
+    lightboxImages.push({ src: IMG_BASE + file, label });
+    return lightboxImages.length - 1;
   };
 
-  document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeCategory = btn.dataset.filter;
-      applyFilters();
+  const esc = str => String(str).replace(/[&<>"]/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]
+  ));
+
+  portfolioProjects.forEach(project => {
+    const block = document.createElement('section');
+    block.className = 'project-block';
+    block.dataset.type = project.type;
+    block.id = 'project-' + project.id;
+
+    // ---- header ----
+    const head = document.createElement('div');
+    head.className = 'project-head';
+    head.setAttribute('data-animate', '');
+    head.innerHTML =
+      `<span class="project-tag">${esc(project.tag)}</span>` +
+      `<h2 class="project-name">${esc(project.name)}</h2>` +
+      `<p class="project-blurb">${esc(project.blurb)}</p>`;
+    block.appendChild(head);
+
+    // ---- before / after pairs ----
+    project.pairs.forEach(pair => {
+      const bIdx = register(pair.before, `${project.name} — Before`);
+      const aIdx = register(pair.after, `${project.name} — After`);
+      const card = document.createElement('div');
+      card.className = 'ba-pair ratio-' + (pair.ratio || 'portrait');
+      card.setAttribute('data-animate', '');
+      card.innerHTML =
+        '<div class="ba-cells">' +
+          `<figure class="ba-cell" data-lb="${bIdx}" tabindex="0" role="button" aria-label="View before photo">` +
+            `<img src="${IMG_BASE}${esc(pair.before)}" alt="${esc(project.name)} — before" loading="lazy" />` +
+            '<span class="ba-cell-label">Before</span>' +
+          '</figure>' +
+          `<figure class="ba-cell" data-lb="${aIdx}" tabindex="0" role="button" aria-label="View after photo">` +
+            `<img src="${IMG_BASE}${esc(pair.after)}" alt="${esc(project.name)} — after" loading="lazy" />` +
+            '<span class="ba-cell-label ba-cell-label--after">After</span>' +
+          '</figure>' +
+        '</div>' +
+        (pair.caption ? `<p class="ba-pair-caption">${esc(pair.caption)}</p>` : '');
+      block.appendChild(card);
     });
+
+    // ---- standalone gallery ----
+    if (project.gallery.length) {
+      const gal = document.createElement('div');
+      gal.className = 'project-gallery';
+      gal.setAttribute('data-animate', '');
+      project.gallery.forEach(shot => {
+        const idx = register(shot.src, shot.caption);
+        const fig = document.createElement('figure');
+        fig.className = 'gallery-item';
+        fig.dataset.lb = idx;
+        fig.tabIndex = 0;
+        fig.setAttribute('role', 'button');
+        fig.setAttribute('aria-label', 'View photo: ' + shot.caption);
+        fig.innerHTML =
+          `<img src="${IMG_BASE}${esc(shot.src)}" alt="${esc(shot.caption)}" loading="lazy" />` +
+          `<figcaption class="gallery-cap">${esc(shot.caption)}</figcaption>`;
+        gal.appendChild(fig);
+      });
+      block.appendChild(gal);
+    }
+
+    root.appendChild(block);
   });
 
-  if (projectFilterRow) {
-    projectFilterRow.addEventListener('click', e => {
-      const btn = e.target.closest('.filter-btn[data-project-filter]');
+  // Open the lightbox on click or keyboard activation of any tile.
+  const activate = el => {
+    const idx = parseInt(el.dataset.lb, 10);
+    if (!Number.isNaN(idx)) openLightbox(idx);
+  };
+  root.addEventListener('click', e => {
+    const el = e.target.closest('[data-lb]');
+    if (el) activate(el);
+  });
+  root.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const el = e.target.closest('[data-lb]');
+    if (el) { e.preventDefault(); activate(el); }
+  });
+
+  // Type filter — show/hide whole project blocks.
+  const filterBar = document.getElementById('portfolio-filter-bar');
+  if (filterBar) {
+    filterBar.addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
       if (!btn) return;
-      projectFilterRow.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      activeProject = btn.dataset.projectFilter;
-      applyFilters();
+      const type = btn.dataset.type;
+      document.querySelectorAll('.project-block').forEach(block => {
+        block.style.display = (type === 'all' || block.dataset.type === type) ? '' : 'none';
+      });
     });
   }
+
+  // Animate the freshly-built sections.
+  initScrollAnimations();
 }
 
 /* ============================================================
@@ -351,10 +448,11 @@ function closeLightbox() {
 function renderLightbox() {
   const img  = document.getElementById('lightbox-img');
   const cap  = document.getElementById('lightbox-caption');
-  const data = portfolioImages[currentIndex];
+  const data = lightboxImages[currentIndex];
+  if (!data) return;
   img.src = data.src;
   img.alt = data.label;
-  cap.textContent = `${data.label} (${currentIndex + 1} / ${portfolioImages.length})`;
+  cap.textContent = `${data.label} (${currentIndex + 1} / ${lightboxImages.length})`;
 }
 
 function initLightbox() {
@@ -369,19 +467,19 @@ function initLightbox() {
   over.addEventListener('click', closeLightbox);
 
   prev.addEventListener('click', () => {
-    currentIndex = (currentIndex - 1 + portfolioImages.length) % portfolioImages.length;
+    currentIndex = (currentIndex - 1 + lightboxImages.length) % lightboxImages.length;
     renderLightbox();
   });
   next.addEventListener('click', () => {
-    currentIndex = (currentIndex + 1) % portfolioImages.length;
+    currentIndex = (currentIndex + 1) % lightboxImages.length;
     renderLightbox();
   });
 
   document.addEventListener('keydown', e => {
     if (lb.hidden) return;
     if (e.key === 'Escape')     closeLightbox();
-    if (e.key === 'ArrowLeft')  { currentIndex = (currentIndex - 1 + portfolioImages.length) % portfolioImages.length; renderLightbox(); }
-    if (e.key === 'ArrowRight') { currentIndex = (currentIndex + 1) % portfolioImages.length; renderLightbox(); }
+    if (e.key === 'ArrowLeft')  { currentIndex = (currentIndex - 1 + lightboxImages.length) % lightboxImages.length; renderLightbox(); }
+    if (e.key === 'ArrowRight') { currentIndex = (currentIndex + 1) % lightboxImages.length; renderLightbox(); }
   });
 
   // Swipe support
@@ -390,8 +488,8 @@ function initLightbox() {
   lb.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
     if (Math.abs(dx) < 40) return;
-    if (dx < 0) { currentIndex = (currentIndex + 1) % portfolioImages.length; }
-    else        { currentIndex = (currentIndex - 1 + portfolioImages.length) % portfolioImages.length; }
+    if (dx < 0) { currentIndex = (currentIndex + 1) % lightboxImages.length; }
+    else        { currentIndex = (currentIndex - 1 + lightboxImages.length) % lightboxImages.length; }
     renderLightbox();
   }, { passive: true });
 }

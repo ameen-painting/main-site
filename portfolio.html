@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Browse before-and-after photos of commercial painting projects completed by Ameen Painting LLC in San Antonio, TX." />
+  <meta name="description" content="Browse before-and-after photos of residential and commercial painting projects completed by Ameen Painting LLC in San Antonio, TX." />
   <title>Portfolio | Ameen Painting LLC</title>
   <link rel="canonical" href="https://ameenpainting.com/portfolio.html" />
   <link rel="icon" href="assets/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
-  <link rel="preload" as="image" href="assets/images/hollister-after-12.webp" />
+  <link rel="preload" as="image" href="assets/images/hollister-after-01.webp" />
   <!-- Open Graph -->
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://ameenpainting.com/portfolio.html" />
   <meta property="og:site_name"   content="Ameen Painting LLC" />
   <meta property="og:title"       content="Portfolio | Ameen Painting LLC" />
-  <meta property="og:description" content="Browse before-and-after photos of commercial painting projects completed by Ameen Painting LLC in San Antonio, TX." />
-  <meta property="og:image"       content="https://ameenpainting.com/assets/images/hollister-after-12.webp" />
+  <meta property="og:description" content="Browse before-and-after photos of residential and commercial painting projects completed by Ameen Painting LLC in San Antonio, TX." />
+  <meta property="og:image"       content="https://ameenpainting.com/assets/images/hollister-05.PNG" />
   <meta property="og:image:alt"   content="Ameen Painting LLC — Commercial painting project in San Antonio, TX" />
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image" />
   <meta name="twitter:title"       content="Portfolio | Ameen Painting LLC" />
-  <meta name="twitter:description" content="Browse before-and-after photos of commercial painting projects completed by Ameen Painting LLC in San Antonio, TX." />
-  <meta name="twitter:image"       content="https://ameenpainting.com/assets/images/hollister-after-12.webp" />
+  <meta name="twitter:description" content="Browse before-and-after photos of residential and commercial painting projects completed by Ameen Painting LLC in San Antonio, TX." />
+  <meta name="twitter:image"       content="https://ameenpainting.com/assets/images/hollister-05.PNG" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -44,7 +44,7 @@
     "telephone": "+12108020818",
     "email": "ameenpaintingteam@gmail.com",
     "areaServed": "San Antonio, TX and surrounding areas",
-    "image": "https://ameenpainting.com/assets/images/hollister-after-12.webp",
+    "image": "https://ameenpainting.com/assets/images/hollister-05.PNG",
     "logo": "https://ameenpainting.com/assets/images/logo.webp",
     "priceRange": "$$"
   }
@@ -95,17 +95,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- ===== PORTFOLIO ===== -->
     <section id="portfolio" class="section">
       <div class="container">
-        <div class="portfolio-filters" data-animate>
-          <button class="filter-btn active" data-filter="all">All Photos</button>
-          <button class="filter-btn" data-filter="before">Before</button>
-          <button class="filter-btn" data-filter="after">After</button>
+        <div class="portfolio-filters" id="portfolio-filter-bar" data-animate>
+          <button class="filter-btn active" data-type="all">All Work</button>
+          <button class="filter-btn" data-type="commercial">Commercial</button>
+          <button class="filter-btn" data-type="residential">Residential</button>
+          <button class="filter-btn" data-type="fencing">Fencing</button>
         </div>
-        <div class="portfolio-filters portfolio-filters-project" id="portfolio-project-filters" data-animate>
-          <button class="filter-btn active" data-project-filter="all">All Projects</button>
-          <!-- Per-project chips populated by JS -->
-        </div>
-        <div class="portfolio-grid" id="portfolio-grid">
-          <!-- Populated by JS -->
+        <div id="portfolio-root">
+          <!-- Project sections populated by JS -->
         </div>
       </div>
     </section>
