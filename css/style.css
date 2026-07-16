@@ -153,6 +153,41 @@ section[id] { scroll-margin-top: 90px; }
   background: var(--accent-dim);
 }
 
+/* ---- 4b. LIGHT SECTION THEME ----
+   Flips a section to a cream surface with dark text, to break up the green.
+   Components need no changes — they already read these custom properties.
+   Gold (#C9A84C) fails contrast on cream, so --accent becomes a bronze.
+   ---------------------------------------------------------------- */
+.theme-light {
+  --bg:           #F5F3ED;
+  --bg-alt:       #F5F3ED;
+  --bg-card:      #FFFFFF;
+  --text:         #151A15;
+  --text-muted:   #5C6159;
+  --accent:       #8A6A1C;
+  --accent-lt:    #6E5416;
+  --accent-dim:   rgba(138, 106, 28, 0.12);
+  --border:       rgba(20, 30, 20, 0.14);
+  --border-hover: rgba(20, 30, 20, 0.42);
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+/* Chips and captions that sit ON TOP of photos must stay dark-surface /
+   light-text regardless of the section around them — otherwise they invert
+   into dark-on-dark and disappear against the image. */
+.theme-light .ba-cell-label {
+  background: rgba(8, 16, 8, 0.78);
+  color: #F0EDE4;
+  border-color: rgba(240, 237, 228, 0.22);
+}
+.theme-light .ba-cell-label--after {
+  background: #C9A84C;
+  color: #0C1C0C;
+  border-color: #C9A84C;
+}
+.theme-light .gallery-cap { color: #F0EDE4; }
+
 /* ---- 5. HEADER ---- */
 #site-header {
   position: fixed;
