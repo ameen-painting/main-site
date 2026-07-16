@@ -565,6 +565,16 @@ section[id] { scroll-margin-top: 90px; }
   color: var(--text-muted);
   max-width: 380px;
 }
+/* Signals that clicking the already-open card starts a quote */
+.accordion-cta {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  transition: color var(--trans);
+}
+.accordion-item:hover .accordion-cta { color: var(--accent-lt); }
 
 @media (max-width: 768px) {
   .services-accordion { flex-direction: column; height: auto; gap: 10px; }

@@ -299,11 +299,22 @@ function initServicesAccordion() {
       item.setAttribute('aria-expanded', 'true');
     };
 
-    item.addEventListener('click', activate);
+    // First click opens the card; clicking the already-open card starts a
+    // quote with that service preselected.
+    const handleActivate = () => {
+      if (!item.classList.contains('is-active')) {
+        activate();
+        return;
+      }
+      const modal = document.getElementById('quote-modal');
+      if (modal && modal.openQuote) modal.openQuote(item.dataset.projectType);
+    };
+
+    item.addEventListener('click', handleActivate);
     item.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        activate();
+        handleActivate();
       }
     });
   });
@@ -583,9 +594,18 @@ function initQuoteModal() {
     window.scrollTo(0, lockedScrollY);
   };
 
-  const openModal = () => {
+  // `projectType` is passed by the services cards to preselect the dropdown.
+  const openModal = projectType => {
     clearTimeout(hideTimer);
     lastFocused = document.activeElement;
+    if (projectType) {
+      // A previous submission may have left the success screen showing.
+      showFormView();
+      const select = modal.querySelector('#qf-project-type');
+      // Options carry no value attribute, so their value is their text —
+      // an unknown type just leaves the placeholder selected.
+      if (select) select.value = projectType;
+    }
     modal.hidden = false;
     lockBodyScroll();
     requestAnimationFrame(() => modal.classList.add('is-open'));
@@ -603,6 +623,11 @@ function initQuoteModal() {
     hideTimer = setTimeout(() => { modal.hidden = true; showFormView(); }, 250);
     if (lastFocused && lastFocused.focus) lastFocused.focus();
   };
+
+  // Exposed so the services cards can open the form with a type preselected.
+  // Assigned here rather than beside showSuccessView because `openModal` is a
+  // const declared below that point.
+  modal.openQuote = openModal;
 
   document.querySelectorAll('.js-open-quote').forEach(trigger => {
     trigger.addEventListener('click', e => {
