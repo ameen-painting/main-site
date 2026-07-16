@@ -1177,15 +1177,16 @@ section[id] { scroll-margin-top: 90px; }
 /* ---- 9. ABOUT ---- */
 .about-grid {
   display: grid;
-  grid-template-columns: 0.82fr 1fr;
+  grid-template-columns: 0.7fr 1fr;
   gap: 56px;
   align-items: center;
 }
+/* 3/4 matches the photo's native ratio — shows it uncropped */
 .about-media img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   object-fit: cover;
-  object-position: center 32%;
+  object-position: center;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
@@ -1653,7 +1654,7 @@ section[id] { scroll-margin-top: 90px; }
 /* ---- 13. RESPONSIVE ---- */
 @media (max-width: 900px) {
   .about-grid  { grid-template-columns: 1fr; gap: 40px; }
-  .about-media { max-width: 400px; margin: 0 auto; }
+  .about-media { max-width: 360px; margin: 0 auto; }
   .contact-grid { grid-template-columns: 1fr; gap: 48px; }
   .footer-grid  { grid-template-columns: 1fr 1fr; gap: 36px; }
   .footer-brand { grid-column: 1 / -1; }
