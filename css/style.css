@@ -452,20 +452,22 @@ section[id] { scroll-margin-top: 90px; }
 .accordion-item-bg {
   position: absolute;
   inset: 0;
+  background-color: var(--bg-card);
+  background-size: cover;
+  background-position: center;
 }
+/* Dark overlay keeps the gold icon + white labels legible over the photos */
 .accordion-item-bg::after {
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    repeating-linear-gradient(115deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 26px),
-    radial-gradient(circle at 85% 15%, rgba(255,255,255,0.10), transparent 55%);
+  background: linear-gradient(180deg, rgba(8, 16, 8, 0.55) 0%, rgba(8, 16, 8, 0.32) 42%, rgba(8, 16, 8, 0.92) 100%);
 }
-.accordion-item-bg--1 { background: linear-gradient(160deg, #1f4020, #0c1c0c 75%); }
-.accordion-item-bg--2 { background: linear-gradient(160deg, #2d6a2d, #12240f 75%); }
-.accordion-item-bg--3 { background: linear-gradient(160deg, #4a3a18, #12240f 75%); }
-.accordion-item-bg--4 { background: linear-gradient(160deg, #294020, #0c1c0c 75%); }
-.accordion-item-bg--5 { background: linear-gradient(160deg, #3d2c18, #0c1c0c 75%); }
+.accordion-item-bg--1 { background-image: url('../assets/images/interior-painting.PNG'); }
+.accordion-item-bg--2 { background-image: url('../assets/images/exterior-painting.PNG'); }
+.accordion-item-bg--3 { background-image: url('../assets/images/cabinet-refinishing.PNG'); }
+.accordion-item-bg--4 { background-image: url('../assets/images/dry-wall.JPG'); }
+.accordion-item-bg--5 { background-image: url('../assets/images/commercial-painting.PNG'); }
 
 .accordion-icon {
   position: absolute;
@@ -555,52 +557,6 @@ section[id] { scroll-margin-top: 90px; }
   .accordion-item.is-active .accordion-item-collapsed-label { opacity: 0; }
   .accordion-item-body { left: 20px; right: 20px; bottom: 20px; }
   .accordion-item-title { font-size: 1.15rem; }
-}
-
-/* ---- 7b. CAPABILITIES LIST ---- */
-.capabilities-wrap {
-  margin-top: 56px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--bg-card);
-  padding: 40px 48px;
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 32px;
-  align-items: start;
-}
-.capabilities-header .section-eyebrow { text-align: left; }
-.capabilities-header h3 {
-  font-size: 1.5rem;
-  color: var(--text);
-  margin-top: 6px;
-}
-.capabilities-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px 32px;
-  padding: 0;
-}
-.capabilities-list li {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  padding-left: 18px;
-  position: relative;
-}
-.capabilities-list li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.55em;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-}
-
-@media (max-width: 900px) {
-  .capabilities-wrap { grid-template-columns: 1fr; padding: 28px; }
-  .capabilities-list { grid-template-columns: 1fr; }
 }
 
 /* ---- 7c. PRICING GUIDE ---- */
@@ -1221,13 +1177,21 @@ section[id] { scroll-margin-top: 90px; }
 /* ---- 9. ABOUT ---- */
 .about-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-  align-items: start;
+  grid-template-columns: 0.82fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+.about-media img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: center 32%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
 }
 .about-text p {
   margin-bottom: 16px;
-  font-size: 1rem;
+  font-size: 1.02rem;
 }
 .about-badges {
   display: flex;
@@ -1235,21 +1199,47 @@ section[id] { scroll-margin-top: 90px; }
   gap: 10px;
   margin-top: 28px;
 }
-.about-quote {
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 28px;
-  margin-bottom: 32px;
-  background: var(--bg-card);
-}
-.about-quote p {
-  font-family: var(--font-heading);
-  font-style: italic;
-  font-size: 1.1rem;
+
+/* Why choose — owner value props */
+.about-why { margin-top: 64px; }
+.about-why h3 {
+  font-size: 1.6rem;
   color: var(--text);
-  line-height: 1.55;
+  text-align: center;
+  margin-bottom: 30px;
 }
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.why-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 30px;
+  transition: border-color var(--trans), transform var(--trans);
+}
+.why-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-3px);
+}
+.why-card h4 {
+  font-family: var(--font-heading);
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-bottom: 10px;
+}
+.why-card p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.about-stats-row { margin-top: 56px; }
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1662,7 +1652,8 @@ section[id] { scroll-margin-top: 90px; }
 
 /* ---- 13. RESPONSIVE ---- */
 @media (max-width: 900px) {
-  .about-grid  { grid-template-columns: 1fr; gap: 48px; }
+  .about-grid  { grid-template-columns: 1fr; gap: 40px; }
+  .about-media { max-width: 400px; margin: 0 auto; }
   .contact-grid { grid-template-columns: 1fr; gap: 48px; }
   .footer-grid  { grid-template-columns: 1fr 1fr; gap: 36px; }
   .footer-brand { grid-column: 1 / -1; }
@@ -1674,6 +1665,7 @@ section[id] { scroll-margin-top: 90px; }
   .form-row { grid-template-columns: 1fr; }
   .quote-cta-card { padding: 32px 24px; }
   .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .why-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 540px) {
