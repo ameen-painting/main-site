@@ -1415,6 +1415,32 @@ section[id] { scroll-margin-top: 90px; }
   line-height: 1.4;
 }
 .warranty-content p { margin-bottom: 20px; max-width: 640px; }
+.warranty-exclusions-title { margin-bottom: 12px !important; }
+.warranty-exclusions {
+  max-width: 640px;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.warranty-exclusions li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+.warranty-exclusions li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
 .warranty-details {
   border: 1px solid var(--border);
   border-radius: var(--radius);
