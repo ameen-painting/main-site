@@ -388,9 +388,16 @@ section[id] { scroll-margin-top: 90px; }
   transition: transform 8s ease;
 }
 /* On phones/portrait tablets the wide landscape crops to a zoomed-in
-   center slice, so swap in a portrait crop of the same photo. */
+   center slice. Swap in a portrait crop of the same photo AND shorten the
+   hero so the image isn't scaled up to fill a full-height viewport (which
+   is what made it read as "zoomed"). */
 @media (max-width: 768px) {
   .hero-bg { background-image: url('../assets/images/stock-house-dusk-mobile.jpg'); }
+  #hero {
+    height: auto;
+    min-height: 0;
+    padding-block: 116px 60px;
+  }
 }
 #hero.loaded .hero-bg { transform: scale(1); }
 .hero-overlay {
