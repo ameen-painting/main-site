@@ -387,11 +387,9 @@ section[id] { scroll-margin-top: 90px; }
   transform: scale(1.04);
   transition: transform 8s ease;
 }
-/* On phones/portrait tablets the wide landscape crops to a zoomed-in
-   center slice, so swap in a portrait version of the hero photo.
-   NOTE: for this to fully remove the zoom, stock-house-dusk-mobile.jpg
-   should be a genuinely TALL portrait image (~9:16), not a crop of the
-   landscape — see the note where it's referenced. */
+/* On phones/portrait tablets the wide desktop landscape would crop to a
+   zoomed-in center slice, so swap in a 9:16 portrait version of the hero
+   photo that fills the tall viewport with minimal cropping. */
 @media (max-width: 768px) {
   .hero-bg { background-image: url('../assets/images/stock-house-dusk-mobile.jpg'); }
 }
