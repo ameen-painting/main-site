@@ -387,6 +387,11 @@ section[id] { scroll-margin-top: 90px; }
   transform: scale(1.04);
   transition: transform 8s ease;
 }
+/* On phones/portrait tablets the wide landscape crops to a zoomed-in
+   center slice, so swap in a portrait crop of the same photo. */
+@media (max-width: 768px) {
+  .hero-bg { background-image: url('../assets/images/stock-house-dusk-mobile.jpg'); }
+}
 #hero.loaded .hero-bg { transform: scale(1); }
 .hero-overlay {
   position: absolute;
