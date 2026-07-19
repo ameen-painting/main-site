@@ -3,8 +3,9 @@
 /* ============================================================
    PORTFOLIO
    Work is grouped by project. Each project can carry:
-     - pairs:   before/after image pairs (the transformation)
-     - gallery: standalone "finished" / detail shots
+     - pairs:         before/after image pairs (the transformation)
+     - gallery:       standalone "finished" / detail shots
+     - galleryGroups: labeled shot piles (e.g. unpaired Before / After)
    `type` drives the filter bar (commercial | residential | fencing).
    To add work later: drop the images in assets/images and add an
    entry here — the page rebuilds itself, no markup changes needed.
@@ -43,13 +44,27 @@ const portfolioProjects = [
     pairs: [
       { before: 'office-before-1.jpeg', after: 'office-after-7.jpeg', ratio: 'portrait', caption: 'Main Hallway' },
       { before: 'office-before-4.jpeg', after: 'office-after-3.jpeg', ratio: 'portrait', caption: 'Reception & Kitchenette' },
-      { before: 'office-before-2.jpeg', after: 'office-after-2.jpeg', ratio: 'portrait', caption: 'Private Office' },
-      { before: 'office-before-5.jpeg', after: 'office-after-4.jpeg', ratio: 'portrait', caption: 'Carpeted Office' },
     ],
-    gallery: [
-      { src: 'office-after-1.jpeg', caption: 'Open Work Area — Finishing Touches' },
-      { src: 'office-after-6.jpeg', caption: 'Hallway & Interior Window Detail' },
-      { src: 'office-after-5.jpeg', caption: 'Dark-Stained Door & Trim' },
+    gallery: [],
+    galleryGroups: [
+      {
+        label: 'Before',
+        shots: [
+          { src: 'office-before-2.jpeg', caption: 'Private Office' },
+          { src: 'office-before-3.jpeg', caption: 'Corner Office' },
+          { src: 'office-before-5.jpeg', caption: 'Carpeted Office' },
+        ],
+      },
+      {
+        label: 'After',
+        shots: [
+          { src: 'office-after-1.jpeg', caption: 'Open Work Area' },
+          { src: 'office-after-2.jpeg', caption: 'Private Office' },
+          { src: 'office-after-4.jpeg', caption: 'Carpeted Office' },
+          { src: 'office-after-5.jpeg', caption: 'Door & Trim Detail' },
+          { src: 'office-after-6.jpeg', caption: 'Hallway Detail' },
+        ],
+      },
     ],
   },
   {
@@ -397,11 +412,10 @@ function initPortfolio() {
     });
 
     // ---- standalone gallery ----
-    if (project.gallery.length) {
+    const buildGallery = shots => {
       const gal = document.createElement('div');
       gal.className = 'project-gallery';
-      gal.setAttribute('data-animate', '');
-      project.gallery.forEach(shot => {
+      shots.forEach(shot => {
         const idx = register(shot.src, shot.caption);
         const fig = document.createElement('figure');
         fig.className = 'gallery-item';
@@ -414,8 +428,28 @@ function initPortfolio() {
           `<figcaption class="gallery-cap">${esc(shot.caption)}</figcaption>`;
         gal.appendChild(fig);
       });
+      return gal;
+    };
+
+    if (project.gallery.length) {
+      const gal = buildGallery(project.gallery);
+      gal.setAttribute('data-animate', '');
       block.appendChild(gal);
     }
+
+    // ---- labeled gallery groups (unpaired before/after piles) ----
+    (project.galleryGroups || []).forEach(group => {
+      if (!group.shots.length) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'project-gallery-group';
+      wrap.setAttribute('data-animate', '');
+      const label = document.createElement('h3');
+      label.className = 'project-gallery-group-label';
+      label.textContent = group.label;
+      wrap.appendChild(label);
+      wrap.appendChild(buildGallery(group.shots));
+      block.appendChild(wrap);
+    });
 
     root.appendChild(block);
   });
