@@ -35,6 +35,24 @@ const portfolioProjects = [
     ],
   },
   {
+    id: 'office-suite',
+    type: 'commercial',
+    tag: 'Commercial Interior',
+    name: 'Office Suite Repaint',
+    blurb: 'A dated, scuffed office suite brightened top to bottom — walls in a clean white with doors and trim refinished in a rich dark stain for sharp, modern contrast.',
+    pairs: [
+      { before: 'office-before-1.jpeg', after: 'office-after-7.jpeg', ratio: 'portrait', caption: 'Main Hallway' },
+      { before: 'office-before-4.jpeg', after: 'office-after-3.jpeg', ratio: 'portrait', caption: 'Reception & Kitchenette' },
+      { before: 'office-before-2.jpeg', after: 'office-after-2.jpeg', ratio: 'portrait', caption: 'Private Office' },
+      { before: 'office-before-5.jpeg', after: 'office-after-4.jpeg', ratio: 'portrait', caption: 'Carpeted Office' },
+    ],
+    gallery: [
+      { src: 'office-after-1.jpeg', caption: 'Open Work Area — Finishing Touches' },
+      { src: 'office-after-6.jpeg', caption: 'Hallway & Interior Window Detail' },
+      { src: 'office-after-5.jpeg', caption: 'Dark-Stained Door & Trim' },
+    ],
+  },
+  {
     id: 'exterior-home',
     type: 'residential',
     tag: 'Residential Exterior',
