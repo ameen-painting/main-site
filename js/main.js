@@ -611,26 +611,39 @@ function initQuoteModal() {
   const formView = document.getElementById('quote-form-view');
   const successView = document.getElementById('quote-success-view');
   const successCloseBtn = document.getElementById('quote-success-close');
-  const modalDialog = modal.querySelector('.modal-dialog');
-  const calEmbedContainer = document.getElementById('cal-booking-embed');
-  const CAL_LINK = 'https://cal.com/ameen-painting-team-sxcqdv/free-consultation';
+  const calTrigger = document.getElementById('cal-booking-trigger');
   let lastFocused = null;
   let hideTimer = null;
   let lockedScrollY = 0;
 
-  // Builds a Cal.com booking URL pre-filled with the just-submitted quote
+  // Our quote form's phone field has no country picker, so a number typed
+  // without a leading "+" (e.g. "818...") gets handed to Cal.com's phone
+  // widget as bare digits — its parser then reads the first digits as a
+  // country calling code (81 = Japan) instead of an area code. Normalize
+  // to E.164 assuming +1, since this is a US (San Antonio) business.
+  const normalizePhone = raw => {
+    if (!raw) return '';
+    const trimmed = raw.trim();
+    if (trimmed.startsWith('+')) return `+${trimmed.replace(/[^\d]/g, '')}`;
+    const digits = trimmed.replace(/[^\d]/g, '');
+    if (!digits) return '';
+    const national = digits.length === 11 && digits.startsWith('1') ? digits.slice(1) : digits;
+    return `+1${national}`;
+  };
+
+  // Builds the Cal.com embed prefill config from the just-submitted quote
   // details, so the customer never has to retype anything to book a call.
-  // Param names must match the booking question "Identifier" values set in
+  // Key names must match the booking question "Identifier" values set in
   // the Cal.com event type editor (Advanced > Booking Questions).
-  const buildCalUrl = data => {
-    const params = new URLSearchParams();
-    if (data?.name) params.set('name', data.name);
-    if (data?.email) params.set('email', data.email);
-    if (data?.phone) params.set('attendeePhoneNumber', data.phone);
-    if (data?.address) params.set('Property-address', data.address);
-    if (data?.projectType) params.set('Project-type', data.projectType);
-    if (data?.details) params.set('Project-details', data.details);
-    return `${CAL_LINK}?${params.toString()}`;
+  const buildCalConfig = data => {
+    const config = {};
+    if (data?.name) config.name = data.name;
+    if (data?.email) config.email = data.email;
+    if (data?.phone) config.attendeePhoneNumber = normalizePhone(data.phone);
+    if (data?.address) config['Property-address'] = data.address;
+    if (data?.projectType) config['Project-type'] = data.projectType;
+    if (data?.details) config['Project-details'] = data.details;
+    return config;
   };
 
   const showSuccessView = quoteData => {
@@ -639,15 +652,8 @@ function initQuoteModal() {
       successView.hidden = false;
       successView.querySelector('h3')?.focus?.();
     }
-    if (modalDialog) modalDialog.classList.add('modal-dialog--booking');
-    if (calEmbedContainer) {
-      // Fresh iframe per submission so the prefill always matches this lead.
-      calEmbedContainer.innerHTML = '';
-      const iframe = document.createElement('iframe');
-      iframe.src = buildCalUrl(quoteData);
-      iframe.title = 'Schedule a free consultation';
-      iframe.loading = 'lazy';
-      calEmbedContainer.appendChild(iframe);
+    if (calTrigger) {
+      calTrigger.setAttribute('data-cal-config', JSON.stringify(buildCalConfig(quoteData)));
     }
     // Google Ads conversion tracking: quote request submitted successfully.
     if (typeof window.gtag === 'function') {
@@ -657,10 +663,13 @@ function initQuoteModal() {
   const showFormView = () => {
     if (successView) successView.hidden = true;
     if (formView) formView.hidden = false;
-    if (modalDialog) modalDialog.classList.remove('modal-dialog--booking');
-    if (calEmbedContainer) calEmbedContainer.innerHTML = '';
   };
   modal.showSuccessView = showSuccessView;
+
+  // Cal.com's popup embed opens as its own overlay on top of the page, so
+  // once the customer launches it there's no reason to keep our modal open
+  // underneath — close it right away rather than stacking two overlays.
+  calTrigger?.addEventListener('click', () => closeModal());
 
   // iOS Safari doesn't reliably honor `overflow: hidden` on the body to
   // stop background scroll/touch-scroll, so pin it with position:fixed

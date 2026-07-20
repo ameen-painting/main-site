@@ -699,16 +699,66 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </svg>
         </div>
         <h3 tabindex="-1">Thank You!</h3>
-        <p>Your quote request has been sent. As a next step, grab a spot below for a free consultation call — your details are already filled in.</p>
-        <div class="cal-booking-wrap">
-          <div id="cal-booking-embed" class="cal-booking-embed" aria-label="Schedule a free consultation"></div>
-        </div>
+        <p>Your quote request has been sent. As a next step, grab a spot on our calendar for a free consultation call — your details are already filled in.</p>
+        <button
+          type="button"
+          class="btn btn-primary btn-full"
+          id="cal-booking-trigger"
+          data-cal-namespace="free-consultation"
+          data-cal-link="ameen-painting-team-sxcqdv/free-consultation"
+          data-cal-config="{}"
+        >
+          Schedule Your Free Consultation
+        </button>
         <button type="button" class="btn btn-outline btn-full" id="quote-success-close">
           Maybe Later
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Cal.com embed: powers the "Schedule Your Free Consultation" button
+       on the quote-form success screen (js/main.js wires up the prefill). -->
+  <script type="text/javascript">
+    (function (C, A, L) {
+      let p = function (a, ar) { a.q.push(ar); };
+      let d = C.document;
+      C.Cal = C.Cal || function () {
+        let cal = C.Cal;
+        let ar = arguments;
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q || [];
+          d.head.appendChild(d.createElement("script")).src = A;
+          cal.loaded = true;
+        }
+        if (ar[0] === L) {
+          const api = function () { p(api, arguments); };
+          const namespace = ar[1];
+          api.q = api.q || [];
+          if (typeof namespace === "string") {
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            p(cal.ns[namespace], ar);
+            p(cal, ["initNamespace", namespace]);
+          } else p(cal, ar);
+          return;
+        }
+        p(cal, ar);
+      };
+    })(window, "https://app.cal.com/embed/embed.js", "init");
+
+    Cal("init", "free-consultation", { origin: "https://app.cal.com" });
+
+    Cal.ns["free-consultation"]("ui", {
+      theme: "light",
+      cssVarsPerTheme: {
+        light: { "cal-brand": "#C9A84C" },
+        dark: { "cal-brand": "#C9A84C" }
+      },
+      hideEventTypeDetails: false,
+      layout: "month_view"
+    });
+  </script>
 
   <script src="js/main.js"></script>
 </body>
