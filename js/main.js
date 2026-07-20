@@ -621,6 +621,10 @@ function initQuoteModal() {
       successView.hidden = false;
       successView.querySelector('h3')?.focus?.();
     }
+    // Google Ads conversion tracking: quote request submitted successfully.
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'conversion', { send_to: 'AW-18265858431/E0HjCOTIiMQcEP_C64VE' });
+    }
   };
   const showFormView = () => {
     if (successView) successView.hidden = true;
