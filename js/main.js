@@ -611,15 +611,43 @@ function initQuoteModal() {
   const formView = document.getElementById('quote-form-view');
   const successView = document.getElementById('quote-success-view');
   const successCloseBtn = document.getElementById('quote-success-close');
+  const modalDialog = modal.querySelector('.modal-dialog');
+  const calEmbedContainer = document.getElementById('cal-booking-embed');
+  const CAL_LINK = 'https://cal.com/ameen-painting-team-sxcqdv/free-consultation';
   let lastFocused = null;
   let hideTimer = null;
   let lockedScrollY = 0;
 
-  const showSuccessView = () => {
+  // Builds a Cal.com booking URL pre-filled with the just-submitted quote
+  // details, so the customer never has to retype anything to book a call.
+  // Param names must match the booking question "Identifier" values set in
+  // the Cal.com event type editor (Advanced > Booking Questions).
+  const buildCalUrl = data => {
+    const params = new URLSearchParams();
+    if (data?.name) params.set('name', data.name);
+    if (data?.email) params.set('email', data.email);
+    if (data?.phone) params.set('attendeePhoneNumber', data.phone);
+    if (data?.address) params.set('Property-address', data.address);
+    if (data?.projectType) params.set('Project-type', data.projectType);
+    if (data?.details) params.set('Project-details', data.details);
+    return `${CAL_LINK}?${params.toString()}`;
+  };
+
+  const showSuccessView = quoteData => {
     if (formView) formView.hidden = true;
     if (successView) {
       successView.hidden = false;
       successView.querySelector('h3')?.focus?.();
+    }
+    if (modalDialog) modalDialog.classList.add('modal-dialog--booking');
+    if (calEmbedContainer) {
+      // Fresh iframe per submission so the prefill always matches this lead.
+      calEmbedContainer.innerHTML = '';
+      const iframe = document.createElement('iframe');
+      iframe.src = buildCalUrl(quoteData);
+      iframe.title = 'Schedule a free consultation';
+      iframe.loading = 'lazy';
+      calEmbedContainer.appendChild(iframe);
     }
     // Google Ads conversion tracking: quote request submitted successfully.
     if (typeof window.gtag === 'function') {
@@ -629,6 +657,8 @@ function initQuoteModal() {
   const showFormView = () => {
     if (successView) successView.hidden = true;
     if (formView) formView.hidden = false;
+    if (modalDialog) modalDialog.classList.remove('modal-dialog--booking');
+    if (calEmbedContainer) calEmbedContainer.innerHTML = '';
   };
   modal.showSuccessView = showSuccessView;
 
@@ -779,7 +809,7 @@ function initQuoteForm() {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnContent;
       }
-      document.getElementById('quote-modal')?.showSuccessView?.();
+      document.getElementById('quote-modal')?.showSuccessView?.({ name, phone, email, address, projectType, details });
     })
     .catch(error => {
       status.textContent = error.message;
