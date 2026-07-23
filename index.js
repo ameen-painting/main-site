@@ -16,18 +16,25 @@ export default {
 };
 
 // ---------------------------------------------------------------------------
-// Scheduling constants — Ameen Painting operates 9am–6pm Central, every day.
-// Each estimate is a 3-hour block. We offer three arrival windows per day.
+// Scheduling constants — Ameen Painting operates 8am–6pm Central, every day.
+// The estimate visit itself is short (15–30 min), but booking an hour also
+// blocks the next hour from other customers (travel/buffer time), so no two
+// bookings on the same day can start within 1 hour of each other.
 // ---------------------------------------------------------------------------
 const CONFIG = {
   timezone: 'America/Chicago',
-  dayStartHour: 9,
-  dayEndHour: 18,
-  estimateDurationHours: 3,
-  startTimes: [9, 12, 15], // 9am, 12pm, 3pm Central
+  dayStartHour: 8,
+  dayEndHour: 18, // last bookable start time
+  estimateDurationMinutes: 30,
+  bufferHours: 1, // booking an hour also blocks this many hours after it
   maxAdvanceDays: 90,
   minLeadHours: 2,
 };
+// Hourly start times, e.g. 8am, 9am, ... 6pm.
+CONFIG.startTimes = Array.from(
+  { length: CONFIG.dayEndHour - CONFIG.dayStartHour + 1 },
+  (_, i) => CONFIG.dayStartHour + i
+);
 
 // ---------------------------------------------------------------------------
 // D1 schema helpers
@@ -150,7 +157,7 @@ function estimateToUtcRange(estimateDate, estimateTime) {
   const refInstant = new Date(Date.UTC(y, mo - 1, d, 12, 0, 0));
   const offset = tzOffsetString(refInstant);
   const start = new Date(`${estimateDate}T${estimateTime}:00${offset}`);
-  const end = new Date(start.getTime() + CONFIG.estimateDurationHours * 60 * 60 * 1000);
+  const end = new Date(start.getTime() + CONFIG.estimateDurationMinutes * 60 * 1000);
   return { start, end };
 }
 
@@ -179,18 +186,33 @@ function buildGoogleCalendarUrl({ name, phone, email, address, projectType, deta
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
+function hourFromTime(time) {
+  return Number(time.split(':')[0]);
+}
+
+// A booked hour also blocks CONFIG.bufferHours after it (travel/buffer time),
+// and — symmetrically — blocks the hours before it that would otherwise
+// overlap that buffer. Two bookings can't start within bufferHours of
+// each other.
+function isHourBlocked(hour, bookedHours) {
+  for (let offset = -CONFIG.bufferHours; offset <= CONFIG.bufferHours; offset++) {
+    if (bookedHours.has(hour + offset)) return true;
+  }
+  return false;
+}
+
 // `cutoffMinutes` is the earliest bookable minute-of-day (minutes since midnight).
 // Pass it for "today" so slots that are already past, or inside the minimum lead
 // time, show as unavailable instead of relying on the client's clock.
 function buildSlots(dateStr, bookedTimes = [], cutoffMinutes = null) {
-  const bookedSet = new Set(bookedTimes);
+  const bookedHours = new Set(bookedTimes.map(hourFromTime));
   return CONFIG.startTimes.map(hour => {
     const time = `${String(hour).padStart(2, '0')}:00`;
     const isPastCutoff = cutoffMinutes !== null && hour * 60 < cutoffMinutes;
     return {
       time,
       label: formatTimeLabel(time),
-      available: !bookedSet.has(time) && !isPastCutoff,
+      available: !isHourBlocked(hour, bookedHours) && !isPastCutoff,
     };
   });
 }
@@ -335,6 +357,20 @@ async function handleQuoteSubmit(request, env) {
       }
     }
 
+    // Booking an hour also blocks the hours around it (see isHourBlocked) — that
+    // can't be expressed as a DB constraint, so check it explicitly first. This
+    // leaves a small race window against a simultaneous adjacent-hour booking;
+    // the UNIQUE(date, time) constraint below still atomically guarantees no two
+    // bookings ever land on the exact same slot.
+    const { results: existingForDay } = await env.DB
+      .prepare('SELECT time FROM bookings WHERE date = ?')
+      .bind(estimateDate)
+      .all();
+    const bookedHours = new Set(existingForDay.map(r => hourFromTime(r.time)));
+    if (isHourBlocked(hourFromTime(estimateTime), bookedHours)) {
+      return jsonError('That time slot was just taken. Please choose another time.', 409);
+    }
+
     // Atomic insert: the UNIQUE(date, time) constraint prevents double-booking.
     const createdAt = new Date().toISOString();
     try {
@@ -394,7 +430,6 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
   const safeDetails = escapeHtml(details);
   const estimateDateLong = escapeHtml(formatDateLong(estimateDate));
   const estimateTimeLabel = escapeHtml(formatTimeLabel(estimateTime));
-  const estimateDurationLabel = `${CONFIG.estimateDurationHours} hours`;
   const googleCalendarUrl = escapeHtml(
     buildGoogleCalendarUrl({ name, phone, email, address, projectType, details, estimateDate, estimateTime })
   );
@@ -455,7 +490,7 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
         <div class="estimate-block">
           <div class="field-label">Scheduled Estimate</div>
           <div class="field-value">${estimateDateLong} at ${estimateTimeLabel}</div>
-          <p class="estimate-note">Arrival window. Estimate typically lasts about ${estimateDurationLabel}.</p>
+          <p class="estimate-note">Estimate visit typically takes 15–30 minutes. The following hour is held as a buffer.</p>
         </div>
 
         <div class="field-card">

@@ -20,8 +20,8 @@ Static marketing site + a Cloudflare Pages Function backend for the quote form:
 ## Booking Flow
 
 1. The user fills out project details in the modal and clicks **Continue to Schedule**.
-2. A calendar panel opens; the user selects a date and one of the available 3-hour arrival windows (9:00 AM, 12:00 PM, 3:00 PM Central, 7 days a week).
-3. On submission, the backend inserts a row with a `UNIQUE(date, time)` constraint. If two people race for the same slot, the database rejects the second insert and the user is asked to pick another time.
+2. A calendar panel opens; the user selects a date and an hourly slot from 8am–6pm Central, 7 days a week. The visit itself is short (15–30 min), but booking an hour also blocks the hour after it (travel/buffer time) — see `isHourBlocked` in `index.js`.
+3. On submission, the backend inserts a row with a `UNIQUE(date, time)` constraint. If two people race for the exact same slot, the database rejects the second insert; adjacent-hour conflicts are checked explicitly before the insert. Either way the user is asked to pick another time.
 4. The business receives a formatted email with the project details and the scheduled estimate time.
 
 ## D1 Database Setup (required before first deploy)

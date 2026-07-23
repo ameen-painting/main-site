@@ -1,6 +1,8 @@
 -- Ameen Painting LLC booking schema
--- Each row represents one booked 3-hour estimate window.
--- The UNIQUE(date, time) constraint is what prevents double-booking.
+-- Each row represents one booked hourly estimate slot (8am-6pm Central).
+-- The UNIQUE(date, time) constraint prevents two bookings on the exact same
+-- slot; the app layer additionally blocks the hour before/after a booking
+-- (see isHourBlocked in index.js) as travel/buffer time.
 
 CREATE TABLE IF NOT EXISTS bookings (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

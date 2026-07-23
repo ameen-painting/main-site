@@ -1907,6 +1907,25 @@ section[id] { scroll-margin-top: 90px; }
   line-height: 1.55;
 }
 
+.quote-duration-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.quote-duration-note svg {
+  width: 15px;
+  height: 15px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
 .btn-text {
   align-self: flex-start;
   padding: 0;
@@ -2090,25 +2109,23 @@ section[id] { scroll-margin-top: 90px; }
 }
 
 .quote-times {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
   gap: 10px;
 }
 
 .time-slot {
-  flex: 1 1 calc(33.333% - 7px);
-  min-width: 90px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 14px 16px;
+  padding: 12px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg-alt);
   color: var(--text);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: border-color var(--trans), background var(--trans), color var(--trans), transform var(--trans);
@@ -2172,8 +2189,8 @@ section[id] { scroll-margin-top: 90px; }
   .calendar-grid { gap: 6px; }
   .calendar-day { min-height: 46px; font-size: 0.92rem; }
   .calendar-day--empty { min-height: 46px; }
-  .time-slot { flex: 1 1 calc(50% - 5px); padding: 12px 14px; font-size: 0.9rem; }
-  .quote-times { gap: 8px; }
+  .time-slot { padding: 10px 6px; font-size: 0.82rem; }
+  .quote-times { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 7px; }
 }
 
 /* ---- 14. SCROLL TO TOP ---- */
