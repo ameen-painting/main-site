@@ -231,14 +231,14 @@ function initQuoteBooking() {
 
   function renderTimes(dateStr) {
     const slots = availability.days[dateStr] || [];
-    const available = slots.filter(s => s.available);
-    if (!available.length) {
+    if (!slots.length) {
       timesContainer.innerHTML = '<p class="no-times">No available windows for this day. Please choose another date.</p>';
       return;
     }
-    timesContainer.innerHTML = available.map(s => `
-      <button type="button" class="time-slot" data-time="${s.time}" aria-label="${s.label}">
+    timesContainer.innerHTML = slots.map(s => `
+      <button type="button" class="time-slot${s.available ? '' : ' is-booked'}" data-time="${s.time}" ${s.available ? '' : 'disabled'} aria-label="${s.label}${s.available ? '' : ' (already booked)'}">
         <span class="time-slot-label">${s.label}</span>
+        ${s.available ? '' : '<span class="time-slot-tag">Booked</span>'}
       </button>
     `).join('');
     if (selectedTime) {
