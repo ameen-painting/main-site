@@ -30,6 +30,7 @@ function initQuoteBooking() {
   const selectedDateLabel = document.getElementById('selected-date-label');
   const bookBtn = document.getElementById('quote-book-btn');
   const successMessage = document.getElementById('quote-success-message');
+  const dialog = modal.querySelector('.modal-dialog');
 
   let lastFocused = null;
   let hideTimer = null;
@@ -98,6 +99,9 @@ function initQuoteBooking() {
 
   function showView(view) {
     [formView, calendarView, successView].forEach(v => { v.hidden = v !== view; });
+    if (dialog) {
+      dialog.classList.toggle('modal-dialog--wide', view === calendarView);
+    }
   }
 
   function showStatus(el, msg, isError) {
