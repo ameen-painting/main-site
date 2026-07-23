@@ -100,6 +100,21 @@ function isValidTime(str) {
   return CONFIG.startTimes.map(t => `${String(t).padStart(2, '0')}:00`).includes(str);
 }
 
+// Basic sanity check — the frontend's phone widget sends E.164 (+12105551234),
+// but this stays permissive enough to accept the plain-input fallback too.
+function isValidPhone(str) {
+  const digits = (str.match(/\d/g) || []).length;
+  return digits >= 7 && /^\+?[0-9()+\-.\s]{7,20}$/.test(str);
+}
+
+// Formats a stored phone number for human display in the lead email.
+// E.164 US/Canada numbers (+1XXXXXXXXXX) become "(XXX) XXX-XXXX"; anything
+// else (other countries, or a raw fallback value) is shown as-is.
+function formatPhoneDisplay(str) {
+  const m = /^\+1(\d{3})(\d{3})(\d{4})$/.exec(str);
+  return m ? `(${m[1]}) ${m[2]}-${m[3]}` : str;
+}
+
 function formatTimeLabel(time) {
   const [h] = time.split(':').map(Number);
   const ampm = h >= 12 ? 'PM' : 'AM';
@@ -113,6 +128,55 @@ function formatDateLong(dateStr, timeZone = CONFIG.timezone) {
   return new Intl.DateTimeFormat('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone
   }).format(date);
+}
+
+// UTC offset string (e.g. '-05:00') for CONFIG.timezone at a given instant.
+// Correctly accounts for DST (CDT = -05:00, CST = -06:00).
+function tzOffsetString(date, timeZone = CONFIG.timezone) {
+  const parts = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'shortOffset' }).formatToParts(date);
+  const tz = parts.find(p => p.type === 'timeZoneName')?.value ?? 'GMT-6';
+  const m = /GMT([+-])(\d+)(?::(\d+))?/.exec(tz);
+  if (!m) return '-06:00';
+  return `${m[1]}${m[2].padStart(2, '0')}:${(m[3] || '00').padStart(2, '0')}`;
+}
+
+// Resolves an estimate's wall-clock date/time (America/Chicago) to the actual
+// UTC instant it represents, so calendar invites land on the correct time
+// regardless of the recipient's own timezone or calendar default.
+function estimateToUtcRange(estimateDate, estimateTime) {
+  const [y, mo, d] = estimateDate.split('-').map(Number);
+  // Use noon UTC on that date just to resolve the correct DST offset — the
+  // actual appointment time is applied afterward via the offset string.
+  const refInstant = new Date(Date.UTC(y, mo - 1, d, 12, 0, 0));
+  const offset = tzOffsetString(refInstant);
+  const start = new Date(`${estimateDate}T${estimateTime}:00${offset}`);
+  const end = new Date(start.getTime() + CONFIG.estimateDurationHours * 60 * 60 * 1000);
+  return { start, end };
+}
+
+function toGCalStamp(date) {
+  return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+}
+
+// Builds a Google Calendar "quick add" link so the recipient can add the
+// booked estimate to their calendar in one click, no sign-in prompts.
+function buildGoogleCalendarUrl({ name, phone, email, address, projectType, details, estimateDate, estimateTime }) {
+  const { start, end } = estimateToUtcRange(estimateDate, estimateTime);
+  const descriptionLines = [
+    `Customer: ${name}`,
+    `Phone: ${formatPhoneDisplay(phone)}`,
+    `Email: ${email}`,
+    `Project type: ${projectType}`,
+    details ? `Details: ${details}` : null,
+  ].filter(Boolean);
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: `Free Estimate — ${name} (${projectType})`,
+    dates: `${toGCalStamp(start)}/${toGCalStamp(end)}`,
+    details: descriptionLines.join('\n'),
+    location: address || 'San Antonio, TX',
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
 // `cutoffMinutes` is the earliest bookable minute-of-day (minutes since midnight).
@@ -247,6 +311,7 @@ async function handleQuoteSubmit(request, env) {
       return jsonError('Please provide all required fields, including a date and time for your estimate.', 400);
     }
 
+    if (!isValidPhone(phone)) return jsonError('Please provide a valid phone number.', 400);
     if (!isValidDate(estimateDate)) return jsonError('Invalid estimate date.', 400);
     if (!isValidTime(estimateTime)) return jsonError('Invalid estimate time.', 400);
 
@@ -322,6 +387,7 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
 
   const safeName = escapeHtml(name);
   const safePhone = escapeHtml(phone);
+  const safePhoneDisplay = escapeHtml(formatPhoneDisplay(phone));
   const safeEmail = escapeHtml(email);
   const safeAddress = escapeHtml(address);
   const safeProjectType = escapeHtml(projectType);
@@ -329,6 +395,9 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
   const estimateDateLong = escapeHtml(formatDateLong(estimateDate));
   const estimateTimeLabel = escapeHtml(formatTimeLabel(estimateTime));
   const estimateDurationLabel = `${CONFIG.estimateDurationHours} hours`;
+  const googleCalendarUrl = escapeHtml(
+    buildGoogleCalendarUrl({ name, phone, email, address, projectType, details, estimateDate, estimateTime })
+  );
 
   const htmlContent = `
 <!DOCTYPE html>
@@ -366,7 +435,8 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
     .estimate-block .estimate-note { color: #9A9B8F; font-size: 13px; margin: 0; }
     .details-box { font-size: 15px; color: #2b3a2b; background-color: #ffffff; border: 1px solid #eef2ee; border-left: 4px solid #C9A84C; padding: 15px; border-radius: 4px; white-space: pre-wrap; margin-top: 8px; line-height: 1.6; }
     .action-container { text-align: center; margin-top: 35px; margin-bottom: 10px; }
-    .btn-reply { background-color: #2D6A2D; color: #ffffff !important; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(45, 106, 45, 0.2); }
+    .btn-reply { background-color: #2D6A2D; color: #ffffff !important; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(45, 106, 45, 0.2); margin: 0 6px 12px; }
+    .btn-calendar { background-color: #ffffff; color: #0C1C0C !important; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 15px; display: inline-block; border: 1.5px solid #C9A84C; margin: 0 6px 12px; }
     .email-footer { background-color: #0C1C0C; color: #9A9B8F; text-align: center; padding: 25px 40px; font-size: 12px; border-top: 1px solid #142014; }
     .email-footer a { color: #C9A84C; text-decoration: none; }
   </style>
@@ -395,7 +465,7 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
           </div>
           <div class="field-row">
             <div class="field-label">Phone Number</div>
-            <div class="field-value"><a href="tel:${safePhone}">${safePhone}</a></div>
+            <div class="field-value"><a href="tel:${safePhone}">${safePhoneDisplay}</a></div>
           </div>
           <div class="field-row">
             <div class="field-label">Email Address</div>
@@ -417,6 +487,7 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
 
         <div class="action-container">
           <a href="mailto:${safeEmail}?subject=Re: Ameen Painting Estimate Booking&body=Hi ${safeName},%0D%0A%0D%0AThank you for booking a free estimate with Ameen Painting for ${safeProjectType.toLowerCase()}. We're looking forward to meeting you on ${estimateDateLong} at ${estimateTimeLabel}.%0D%0A%0D%0ABest regards,%0D%0AAmeen Painting Team" class="btn-reply">Reply directly to Customer</a>
+          <a href="${googleCalendarUrl}" target="_blank" rel="noopener noreferrer" class="btn-calendar">Add to Google Calendar</a>
         </div>
       </div>
       <div class="email-footer">

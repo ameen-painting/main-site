@@ -1631,6 +1631,34 @@ section[id] { scroll-margin-top: 90px; }
 .form-field.has-error textarea {
   border-color: #C96A5C;
 }
+
+/* Phone input (intl-tel-input) */
+.form-field .iti { width: 100%; }
+.iti {
+  --iti-border-color: var(--border);
+  --iti-hover-color: var(--accent-dim);
+  --iti-country-selector-bg: var(--bg-alt);
+  --iti-icon-color: var(--text-muted);
+}
+.iti__selected-country-primary,
+.iti__selected-dial-code { color: var(--text); }
+.iti--inline-country-selector .iti__country-selector {
+  background: var(--bg-card);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.iti__country-list {
+  background: var(--bg-card);
+  color: var(--text);
+}
+.iti__country-name { color: var(--text); }
+.iti__country.iti__highlight { background-color: var(--accent-dim); }
+.iti__search-input {
+  background: var(--bg-alt);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+.iti__no-results { color: var(--text-muted); }
+
 .form-status {
   font-size: 0.85rem;
   min-height: 1.2em;

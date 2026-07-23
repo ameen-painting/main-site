@@ -31,6 +31,14 @@ function initQuoteBooking() {
   const bookBtn = document.getElementById('quote-book-btn');
   const successMessage = document.getElementById('quote-success-message');
   const dialog = modal.querySelector('.modal-dialog');
+  const phoneInput = document.getElementById('qf-phone');
+
+  const phoneIti = (typeof window.intlTelInput === 'function' && phoneInput)
+    ? window.intlTelInput(phoneInput, {
+        initialCountry: 'us',
+        strictMode: true,
+      })
+    : null;
 
   let lastFocused = null;
   let hideTimer = null;
@@ -275,13 +283,12 @@ function initQuoteBooking() {
   }
 
   // Form validation → move to scheduling
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     clearStatus(status);
     form.querySelectorAll('.form-field').forEach(f => f.classList.remove('has-error'));
 
     const name = form.name.value.trim();
-    const phone = form.phone.value.trim();
     const email = form.email.value.trim();
     const address = form.address.value.trim();
     const projectType = form.projectType.value;
@@ -295,7 +302,19 @@ function initQuoteBooking() {
     };
 
     if (!name) markError('name');
-    if (!phonePattern.test(phone)) markError('phone');
+
+    let phone = form.phone.value.trim();
+    if (phoneIti) {
+      if (phoneIti.promise) await phoneIti.promise.catch(() => {});
+      if (!phoneIti.isValidNumber()) {
+        markError('phone');
+      } else {
+        phone = phoneIti.getNumber();
+      }
+    } else if (!phonePattern.test(phone)) {
+      markError('phone');
+    }
+
     if (!emailPattern.test(email)) markError('email');
     if (!projectType) markError('projectType');
 
