@@ -115,16 +115,27 @@ function formatDateLong(dateStr, timeZone = CONFIG.timezone) {
   }).format(date);
 }
 
-function buildSlots(dateStr, bookedTimes = []) {
+// `cutoffMinutes` is the earliest bookable minute-of-day (minutes since midnight).
+// Pass it for "today" so slots that are already past, or inside the minimum lead
+// time, show as unavailable instead of relying on the client's clock.
+function buildSlots(dateStr, bookedTimes = [], cutoffMinutes = null) {
   const bookedSet = new Set(bookedTimes);
   return CONFIG.startTimes.map(hour => {
     const time = `${String(hour).padStart(2, '0')}:00`;
+    const isPastCutoff = cutoffMinutes !== null && hour * 60 < cutoffMinutes;
     return {
       time,
       label: formatTimeLabel(time),
-      available: !bookedSet.has(time),
+      available: !bookedSet.has(time) && !isPastCutoff,
     };
   });
+}
+
+// Minutes-since-midnight (America/Chicago) after which a new booking may start.
+function bookingCutoffMinutes() {
+  const p = localParts();
+  const nowMinutes = Number(p.hour) * 60 + Number(p.minute);
+  return nowMinutes + CONFIG.minLeadHours * 60;
 }
 
 // ---------------------------------------------------------------------------
@@ -133,7 +144,13 @@ function buildSlots(dateStr, bookedTimes = []) {
 function jsonResponse(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      // Availability changes with every booking — never let the browser or
+      // Cloudflare's edge cache serve a stale snapshot.
+      'Cache-Control': 'no-store',
+    },
   });
 }
 
@@ -162,7 +179,8 @@ async function handleAvailability(request, env) {
         .bind(date)
         .all();
       const booked = results.map(r => r.time);
-      return jsonResponse({ date, slots: buildSlots(date, booked) });
+      const cutoff = date === localDateString() ? bookingCutoffMinutes() : null;
+      return jsonResponse({ date, slots: buildSlots(date, booked, cutoff) });
     }
 
     if (month) {
@@ -181,11 +199,13 @@ async function handleAvailability(request, env) {
       const [y, m] = month.split('-').map(Number);
       const daysInMonth = new Date(Date.UTC(y, m, 0, 12, 0, 0)).getUTCDate();
       const today = localDateString();
+      const todayCutoff = bookingCutoffMinutes();
       const days = {};
 
       for (let d = 1; d <= daysInMonth; d++) {
         const ds = `${month}-${String(d).padStart(2, '0')}`;
-        const slots = buildSlots(ds, bookedMap[ds] || []);
+        const cutoff = ds === today ? todayCutoff : null;
+        const slots = buildSlots(ds, bookedMap[ds] || [], cutoff);
         if (ds < today) slots.forEach(s => (s.available = false));
         days[ds] = slots;
       }
