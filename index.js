@@ -1,10 +1,13 @@
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // Route API requests for lead submissions
     if (url.pathname === '/api/submit-quote' && request.method === 'POST') {
       return handleQuoteSubmit(request, env);
+    }
+
+    if (url.pathname === '/api/availability' && request.method === 'GET') {
+      return handleAvailability(request, env);
     }
 
     // Fallback: serve static assets directly from binding
@@ -12,18 +15,203 @@ export default {
   }
 };
 
-async function handleQuoteSubmit(request, env) {
+// ---------------------------------------------------------------------------
+// Scheduling constants — Ameen Painting operates 9am–6pm Central, every day.
+// Each estimate is a 3-hour block. We offer three arrival windows per day.
+// ---------------------------------------------------------------------------
+const CONFIG = {
+  timezone: 'America/Chicago',
+  dayStartHour: 9,
+  dayEndHour: 18,
+  estimateDurationHours: 3,
+  startTimes: [9, 12, 15], // 9am, 12pm, 3pm Central
+  maxAdvanceDays: 90,
+  minLeadHours: 2,
+};
+
+// ---------------------------------------------------------------------------
+// D1 schema helpers
+// ---------------------------------------------------------------------------
+async function ensureSchema(db) {
+  if (!db) return;
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS bookings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      time TEXT NOT NULL,
+      name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      email TEXT NOT NULL,
+      address TEXT,
+      project_type TEXT NOT NULL,
+      details TEXT,
+      created_at TEXT NOT NULL,
+      UNIQUE(date, time)
+    )
+  `).run();
+}
+
+// ---------------------------------------------------------------------------
+// Date / time utilities (Central / America/Chicago)
+// ---------------------------------------------------------------------------
+function localParts(date = new Date(), timeZone = CONFIG.timezone) {
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(date);
+  const get = type => parts.find(p => p.type === type)?.value;
+  return {
+    year: get('year'),
+    month: get('month'),
+    day: get('day'),
+    hour: get('hour'),
+    minute: get('minute'),
+    second: get('second'),
+  };
+}
+
+function localDateString(date = new Date(), timeZone = CONFIG.timezone) {
+  const p = localParts(date, timeZone);
+  return `${p.year}-${p.month}-${p.day}`;
+}
+
+function localTimeString(date = new Date(), timeZone = CONFIG.timezone) {
+  const p = localParts(date, timeZone);
+  return `${p.hour}:${p.minute}`;
+}
+
+function addLocalDays(days) {
+  const now = new Date();
+  const utc = now.getTime() + days * 24 * 60 * 60 * 1000;
+  return localDateString(new Date(utc));
+}
+
+function isValidDate(str) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(str)) return false;
+  const [y, m, d] = str.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+  return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
+}
+
+function isValidTime(str) {
+  return CONFIG.startTimes.map(t => `${String(t).padStart(2, '0')}:00`).includes(str);
+}
+
+function formatTimeLabel(time) {
+  const [h] = time.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 || 12;
+  return `${hour12}:00 ${ampm}`;
+}
+
+function formatDateLong(dateStr, timeZone = CONFIG.timezone) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+  return new Intl.DateTimeFormat('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone
+  }).format(date);
+}
+
+function buildSlots(dateStr, bookedTimes = []) {
+  const bookedSet = new Set(bookedTimes);
+  return CONFIG.startTimes.map(hour => {
+    const time = `${String(hour).padStart(2, '0')}:00`;
+    return {
+      time,
+      label: formatTimeLabel(time),
+      available: !bookedSet.has(time),
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Response helpers
+// ---------------------------------------------------------------------------
+function jsonResponse(obj, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+  });
+}
+
+function jsonError(message, status = 400) {
+  return jsonResponse({ error: message }, status);
+}
+
+// ---------------------------------------------------------------------------
+// Availability API
+// ---------------------------------------------------------------------------
+async function handleAvailability(request, env) {
   try {
-    // 1. Verify Resend API Key
-    const resendApiKey = env.RESEND_API_KEY;
-    if (!resendApiKey) {
-      return new Response(
-        JSON.stringify({ error: 'Resend API Key is not configured on the server.' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
+    if (!env.DB) {
+      return jsonError('Booking database is not configured.', 503);
+    }
+    await ensureSchema(env.DB);
+
+    const url = new URL(request.url);
+    const date = url.searchParams.get('date');
+    const month = url.searchParams.get('month');
+
+    if (date) {
+      if (!isValidDate(date)) return jsonError('Invalid date format.', 400);
+      const { results } = await env.DB
+        .prepare('SELECT time FROM bookings WHERE date = ?')
+        .bind(date)
+        .all();
+      const booked = results.map(r => r.time);
+      return jsonResponse({ date, slots: buildSlots(date, booked) });
     }
 
-    // 2. Parse request payload (JSON or FormData)
+    if (month) {
+      if (!/^\d{4}-\d{2}$/.test(month)) return jsonError('Invalid month format.', 400);
+      const { results } = await env.DB
+        .prepare('SELECT date, time FROM bookings WHERE date LIKE ?')
+        .bind(`${month}-%`)
+        .all();
+
+      const bookedMap = {};
+      for (const row of results) {
+        if (!bookedMap[row.date]) bookedMap[row.date] = [];
+        bookedMap[row.date].push(row.time);
+      }
+
+      const [y, m] = month.split('-').map(Number);
+      const daysInMonth = new Date(Date.UTC(y, m, 0, 12, 0, 0)).getUTCDate();
+      const today = localDateString();
+      const days = {};
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const ds = `${month}-${String(d).padStart(2, '0')}`;
+        const slots = buildSlots(ds, bookedMap[ds] || []);
+        if (ds < today) slots.forEach(s => (s.available = false));
+        days[ds] = slots;
+      }
+      return jsonResponse({ month, days });
+    }
+
+    return jsonError('Provide ?date=YYYY-MM-DD or ?month=YYYY-MM.', 400);
+  } catch (err) {
+    return jsonError(`Server Error: ${err.message}`, 500);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Quote submission + atomic booking
+// ---------------------------------------------------------------------------
+async function handleQuoteSubmit(request, env) {
+  try {
+    const resendApiKey = env.RESEND_API_KEY;
+    if (!resendApiKey) {
+      return jsonError('Resend API Key is not configured on the server.', 500);
+    }
+    if (!env.DB) {
+      return jsonError('Booking database is not configured.', 503);
+    }
+    await ensureSchema(env.DB);
+
     let data;
     const contentType = request.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
@@ -33,37 +221,96 @@ async function handleQuoteSubmit(request, env) {
       data = Object.fromEntries(formData.entries());
     }
 
-    const { name, phone, email, address, projectType, details } = data;
+    const { name, phone, email, address, projectType, details, estimateDate, estimateTime } = data;
 
-    // Validation
-    if (!name || !phone || !email || !projectType) {
-      return new Response(
-        JSON.stringify({ error: 'Please provide all required fields (Name, Phone, Email, Project Type).' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+    if (!name || !phone || !email || !projectType || !estimateDate || !estimateTime) {
+      return jsonError('Please provide all required fields, including a date and time for your estimate.', 400);
     }
 
-    // Helper to safely format text for HTML
-    const escapeHtml = (unsafe) => {
-      if (!unsafe) return '';
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    };
+    if (!isValidDate(estimateDate)) return jsonError('Invalid estimate date.', 400);
+    if (!isValidTime(estimateTime)) return jsonError('Invalid estimate time.', 400);
 
-    const safeName = escapeHtml(name);
-    const safePhone = escapeHtml(phone);
-    const safeEmail = escapeHtml(email);
-    const safeAddress = escapeHtml(address);
-    const safeProjectType = escapeHtml(projectType);
-    const safeDetails = escapeHtml(details);
+    const today = localDateString();
+    const maxDateStr = addLocalDays(CONFIG.maxAdvanceDays);
 
-    // 3. Construct premium brand-matching HTML template
-    // Color Palette: Forest Green (#0C1C0C), Gold (#C9A84C), Gold Accent (#E2C97E), Card Dark Green (#192819)
-    const htmlContent = `
+    if (estimateDate < today) return jsonError('Please choose a future date.', 400);
+    if (estimateDate > maxDateStr) {
+      return jsonError(`Bookings are only available up to ${CONFIG.maxAdvanceDays} days in advance.`, 400);
+    }
+
+    if (estimateDate === today) {
+      const now = new Date();
+      const currentTime = localTimeString(now);
+      const [selH] = estimateTime.split(':').map(Number);
+      const selectedMinutes = selH * 60;
+      const [curH, curM] = currentTime.split(':').map(Number);
+      const currentMinutes = curH * 60 + Number(curM);
+      if (selectedMinutes < currentMinutes + CONFIG.minLeadHours * 60) {
+        return jsonError('Please choose a time at least 2 hours from now.', 400);
+      }
+    }
+
+    // Atomic insert: the UNIQUE(date, time) constraint prevents double-booking.
+    const createdAt = new Date().toISOString();
+    try {
+      await env.DB.prepare(`
+        INSERT INTO bookings
+        (date, time, name, phone, email, address, project_type, details, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        estimateDate, estimateTime, name, phone, email,
+        address || '', projectType, details || '', createdAt
+      ).run();
+    } catch (dbErr) {
+      if (dbErr && dbErr.message && dbErr.message.toLowerCase().includes('unique constraint failed')) {
+        return jsonError('That time slot was just taken. Please choose another time.', 409);
+      }
+      throw dbErr;
+    }
+
+    const emailResult = await sendLeadEmail({
+      resendApiKey,
+      name,
+      phone,
+      email,
+      address,
+      projectType,
+      details,
+      estimateDate,
+      estimateTime,
+    });
+
+    return jsonResponse({ success: true, id: emailResult.id });
+  } catch (err) {
+    return jsonError(`Server Error: ${err.message}`, 500);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Lead email via Resend
+// ---------------------------------------------------------------------------
+async function sendLeadEmail({ resendApiKey, name, phone, email, address, projectType, details, estimateDate, estimateTime }) {
+  const escapeHtml = (unsafe) => {
+    if (!unsafe) return '';
+    return unsafe
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  };
+
+  const safeName = escapeHtml(name);
+  const safePhone = escapeHtml(phone);
+  const safeEmail = escapeHtml(email);
+  const safeAddress = escapeHtml(address);
+  const safeProjectType = escapeHtml(projectType);
+  const safeDetails = escapeHtml(details);
+  const estimateDateLong = escapeHtml(formatDateLong(estimateDate));
+  const estimateTimeLabel = escapeHtml(formatTimeLabel(estimateTime));
+  const estimateDurationLabel = `${CONFIG.estimateDurationHours} hours`;
+
+  const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,132 +326,29 @@ async function handleQuoteSubmit(request, env) {
       padding: 0;
       -webkit-font-smoothing: antialiased;
     }
-    .email-wrapper {
-      width: 100%;
-      background-color: #f4f6f4;
-      padding: 30px 15px;
-      box-sizing: border-box;
-    }
-    .email-container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(12, 28, 12, 0.08);
-      border: 1px solid #dce4dc;
-    }
-    .email-header {
-      background-color: #0C1C0C;
-      padding: 35px 40px;
-      text-align: center;
-      border-bottom: 4px solid #C9A84C;
-    }
-    .email-header h1 {
-      color: #F0EDE4;
-      font-family: Georgia, serif;
-      font-size: 26px;
-      font-weight: 700;
-      margin: 0;
-      letter-spacing: 1px;
-    }
-    .email-header p {
-      color: #C9A84C;
-      font-size: 13px;
-      margin: 8px 0 0 0;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-weight: 600;
-    }
-    .email-body {
-      padding: 40px;
-    }
-    .email-intro {
-      font-size: 16px;
-      line-height: 1.6;
-      margin-top: 0;
-      margin-bottom: 30px;
-      color: #2b3a2b;
-    }
-    .field-card {
-      background-color: #f9faf9;
-      border: 1px solid #eef2ee;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 25px;
-    }
-    .field-row {
-      margin-bottom: 20px;
-      border-bottom: 1px solid #eef2ee;
-      padding-bottom: 12px;
-    }
-    .field-row:last-child {
-      margin-bottom: 0;
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-    .field-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: #7a827a;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .field-value {
-      font-size: 16px;
-      color: #0C1C0C;
-      font-weight: 500;
-    }
-    .field-value a {
-      color: #2D6A2D;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .field-value.highlight {
-      color: #C9A84C;
-      font-weight: 600;
-    }
-    .details-box {
-      font-size: 15px;
-      color: #2b3a2b;
-      background-color: #ffffff;
-      border: 1px solid #eef2ee;
-      border-left: 4px solid #C9A84C;
-      padding: 15px;
-      border-radius: 4px;
-      white-space: pre-wrap;
-      margin-top: 8px;
-      line-height: 1.6;
-    }
-    .action-container {
-      text-align: center;
-      margin-top: 35px;
-      margin-bottom: 10px;
-    }
-    .btn-reply {
-      background-color: #2D6A2D;
-      color: #ffffff !important;
-      padding: 14px 30px;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 15px;
-      display: inline-block;
-      box-shadow: 0 4px 10px rgba(45, 106, 45, 0.2);
-    }
-    .email-footer {
-      background-color: #0C1C0C;
-      color: #9A9B8F;
-      text-align: center;
-      padding: 25px 40px;
-      font-size: 12px;
-      border-top: 1px solid #142014;
-    }
-    .email-footer a {
-      color: #C9A84C;
-      text-decoration: none;
-    }
+    .email-wrapper { width: 100%; background-color: #f4f6f4; padding: 30px 15px; box-sizing: border-box; }
+    .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(12, 28, 12, 0.08); border: 1px solid #dce4dc; }
+    .email-header { background-color: #0C1C0C; padding: 35px 40px; text-align: center; border-bottom: 4px solid #C9A84C; }
+    .email-header h1 { color: #F0EDE4; font-family: Georgia, serif; font-size: 26px; font-weight: 700; margin: 0; letter-spacing: 1px; }
+    .email-header p { color: #C9A84C; font-size: 13px; margin: 8px 0 0 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
+    .email-body { padding: 40px; }
+    .email-intro { font-size: 16px; line-height: 1.6; margin-top: 0; margin-bottom: 30px; color: #2b3a2b; }
+    .field-card { background-color: #f9faf9; border: 1px solid #eef2ee; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+    .field-row { margin-bottom: 20px; border-bottom: 1px solid #eef2ee; padding-bottom: 12px; }
+    .field-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+    .field-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #7a827a; font-weight: 700; margin-bottom: 6px; }
+    .field-value { font-size: 16px; color: #0C1C0C; font-weight: 500; }
+    .field-value a { color: #2D6A2D; text-decoration: none; font-weight: 600; }
+    .field-value.highlight { color: #C9A84C; font-weight: 600; }
+    .estimate-block { background-color: #0C1C0C; border-radius: 8px; padding: 20px; margin-bottom: 25px; text-align: center; border: 1px solid #C9A84C; }
+    .estimate-block .field-label { color: #C9A84C; margin-bottom: 8px; }
+    .estimate-block .field-value { color: #F0EDE4; font-family: Georgia, serif; font-size: 22px; margin-bottom: 6px; }
+    .estimate-block .estimate-note { color: #9A9B8F; font-size: 13px; margin: 0; }
+    .details-box { font-size: 15px; color: #2b3a2b; background-color: #ffffff; border: 1px solid #eef2ee; border-left: 4px solid #C9A84C; padding: 15px; border-radius: 4px; white-space: pre-wrap; margin-top: 8px; line-height: 1.6; }
+    .action-container { text-align: center; margin-top: 35px; margin-bottom: 10px; }
+    .btn-reply { background-color: #2D6A2D; color: #ffffff !important; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(45, 106, 45, 0.2); }
+    .email-footer { background-color: #0C1C0C; color: #9A9B8F; text-align: center; padding: 25px 40px; font-size: 12px; border-top: 1px solid #142014; }
+    .email-footer a { color: #C9A84C; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -216,34 +360,35 @@ async function handleQuoteSubmit(request, env) {
       </div>
       <div class="email-body">
         <p class="email-intro">Hi Stepan,</p>
-        <p class="email-intro">A new free quote request has been submitted. Below are the customer and project details:</p>
-        
+        <p class="email-intro">A new free estimate has been booked on the website. The customer selected the appointment time below:</p>
+
+        <div class="estimate-block">
+          <div class="field-label">Scheduled Estimate</div>
+          <div class="field-value">${estimateDateLong} at ${estimateTimeLabel}</div>
+          <p class="estimate-note">Arrival window. Estimate typically lasts about ${estimateDurationLabel}.</p>
+        </div>
+
         <div class="field-card">
           <div class="field-row">
             <div class="field-label">Customer Name</div>
             <div class="field-value">${safeName}</div>
           </div>
-          
           <div class="field-row">
             <div class="field-label">Phone Number</div>
             <div class="field-value"><a href="tel:${safePhone}">${safePhone}</a></div>
           </div>
-          
           <div class="field-row">
             <div class="field-label">Email Address</div>
             <div class="field-value"><a href="mailto:${safeEmail}">${safeEmail}</a></div>
           </div>
-          
           <div class="field-row">
             <div class="field-label">Property Address</div>
             <div class="field-value">${safeAddress ? safeAddress : '<i>Not provided</i>'}</div>
           </div>
-
           <div class="field-row">
             <div class="field-label">Project Type</div>
             <div class="field-value highlight">${safeProjectType}</div>
           </div>
-
           <div class="field-row">
             <div class="field-label">Project Details</div>
             <div class="details-box">${safeDetails ? safeDetails : '<i>No additional details provided.</i>'}</div>
@@ -251,7 +396,7 @@ async function handleQuoteSubmit(request, env) {
         </div>
 
         <div class="action-container">
-          <a href="mailto:${safeEmail}?subject=Re: Ameen Painting Quote Request&body=Hi ${safeName},%0D%0A%0D%0AThank you for contacting Ameen Painting! We received your quote request for ${safeProjectType.toLowerCase()} and we would love to learn more...%0D%0A%0D%0ABest regards,%0D%0AAmeen Painting Team" class="btn-reply">Reply directly to Customer</a>
+          <a href="mailto:${safeEmail}?subject=Re: Ameen Painting Estimate Booking&body=Hi ${safeName},%0D%0A%0D%0AThank you for booking a free estimate with Ameen Painting for ${safeProjectType.toLowerCase()}. We're looking forward to meeting you on ${estimateDateLong} at ${estimateTimeLabel}.%0D%0A%0D%0ABest regards,%0D%0AAmeen Painting Team" class="btn-reply">Reply directly to Customer</a>
         </div>
       </div>
       <div class="email-footer">
@@ -261,42 +406,27 @@ async function handleQuoteSubmit(request, env) {
   </div>
 </body>
 </html>
-    `;
+  `;
 
-    // 4. Submit POST to Resend API
-    const resendResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'Ameen Painting Leads <leads@reports.ameenpainting.com>',
-        to: ['ameenpaintingteam@gmail.com'],
-        reply_to: email, // Click reply to directly write back to the customer's email
-        subject: `New Lead: ${name} (${projectType})`,
-        html: htmlContent,
-      }),
-    });
+  const resendResponse = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${resendApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'Ameen Painting Leads <leads@reports.ameenpainting.com>',
+      to: ['ameenpaintingteam@gmail.com'],
+      reply_to: email,
+      subject: `New Lead + Booking: ${name} — ${projectType} on ${estimateDateLong}`,
+      html: htmlContent,
+    }),
+  });
 
-    if (!resendResponse.ok) {
-      const errorText = await resendResponse.text();
-      return new Response(
-        JSON.stringify({ error: `Resend API Error: ${errorText}` }),
-        { status: 502, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const resendData = await resendResponse.json();
-    return new Response(
-      JSON.stringify({ success: true, id: resendData.id }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ error: `Server Error: ${error.message}` }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+  if (!resendResponse.ok) {
+    const errorText = await resendResponse.text();
+    throw new Error(`Resend API Error: ${errorText}`);
   }
+
+  return await resendResponse.json();
 }

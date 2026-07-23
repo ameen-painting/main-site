@@ -1826,6 +1826,243 @@ section[id] { scroll-margin-top: 90px; }
   .modal-dialog { padding: 36px 22px; }
 }
 
+/* ---- 13c. CUSTOM BOOKING CALENDAR ---- */
+
+.quote-calendar-view {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quote-calendar-view h3 {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.calendar-sub {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.btn-text {
+  align-self: flex-start;
+  padding: 0;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--trans);
+}
+.btn-text:hover { color: var(--accent-lt); }
+
+.calendar-back {
+  margin-bottom: -8px;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.calendar-prev,
+.calendar-next {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  background: var(--bg-alt);
+  font-size: 1.4rem;
+  line-height: 1;
+  transition: border-color var(--trans), background var(--trans);
+  cursor: pointer;
+}
+
+.calendar-prev:hover,
+.calendar-next:hover {
+  border-color: var(--border-hover);
+  background: var(--accent-dim);
+}
+
+.calendar-prev:disabled,
+.calendar-next:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.calendar-month-label {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.calendar-weekdays span {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar-day {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-alt);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--trans), background var(--trans), color var(--trans);
+  padding: 0;
+}
+
+.calendar-day:hover:not(:disabled):not(.is-unavailable) {
+  border-color: var(--border-hover);
+  background: var(--accent-dim);
+}
+
+.calendar-day.is-today {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.calendar-day.is-selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0C1C0C;
+  font-weight: 600;
+}
+
+.calendar-day.is-unavailable,
+.calendar-day:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: transparent;
+}
+
+.calendar-day--empty {
+  pointer-events: none;
+}
+
+.calendar-day.is-selected .calendar-day-dot { background: #0C1C0C; }
+
+.calendar-day-dot {
+  position: absolute;
+  bottom: 6px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.calendar-loading,
+.calendar-error {
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 12px 0;
+}
+
+.calendar-loading {
+  color: var(--text-muted);
+}
+
+.quote-times-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.quote-times-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.quote-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.time-slot {
+  flex: 1 1 100px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-alt);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--trans), background var(--trans), color var(--trans);
+}
+
+.time-slot:hover:not(:disabled) {
+  border-color: var(--border-hover);
+  background: var(--accent-dim);
+}
+
+.time-slot.is-selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0C1C0C;
+}
+
+.time-slot:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.no-times {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Reduce modal padding slightly when the calendar is open on small screens */
+@media (max-width: 640px) {
+  .quote-calendar-view h3 { font-size: 1.15rem; }
+  .calendar-day { font-size: 0.8rem; }
+  .time-slot { flex: 1 1 80px; padding: 10px 12px; font-size: 0.85rem; }
+}
+
 /* ---- 14. SCROLL TO TOP ---- */
 .scroll-top-btn {
   position: fixed;

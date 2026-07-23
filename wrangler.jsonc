@@ -7,5 +7,12 @@
   "assets": {
     "directory": ".",
     "binding": "ASSETS"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ameen-painting-bookings",
+      "database_id": "e955ac99-5bf2-40f2-b7a0-c5921c696640"
+    }
+  ]
 }
