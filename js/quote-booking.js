@@ -30,6 +30,7 @@ function initQuoteBooking() {
   const selectedDateLabel = document.getElementById('selected-date-label');
   const bookBtn = document.getElementById('quote-book-btn');
   const successMessage = document.getElementById('quote-success-message');
+  const successGcalLink = document.getElementById('quote-success-gcal');
   const dialog = modal.querySelector('.modal-dialog');
   const phoneInput = document.getElementById('qf-phone');
 
@@ -167,6 +168,8 @@ function initQuoteBooking() {
     calendarError.hidden = true;
     calendarLoading.hidden = true;
     availability = { days: {} };
+    successGcalLink.hidden = true;
+    successGcalLink.href = '#';
   }
 
   async function loadAvailability(year, month) {
@@ -269,6 +272,12 @@ function initQuoteBooking() {
         if (!res.ok) throw new Error(data.error || 'Booking failed. Please try again.');
         const appointment = `${formatDateLabel(selectedDate)} at ${formatTimeLabel(selectedTime)}`;
         successMessage.textContent = `Your free estimate is booked for ${appointment}. We'll see you then.`;
+        if (data.googleCalendarUrl) {
+          successGcalLink.href = data.googleCalendarUrl;
+          successGcalLink.hidden = false;
+        } else {
+          successGcalLink.hidden = true;
+        }
         showView(successView);
         successView.querySelector('h3')?.focus();
         if (typeof window.gtag === 'function') {

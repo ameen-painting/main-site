@@ -175,8 +175,20 @@ function toGCalStamp(date) {
 
 // Builds a Google Calendar "quick add" link so the recipient can add the
 // booked estimate to their calendar in one click, no sign-in prompts.
-function buildGoogleCalendarUrl({ name, phone, email, address, projectType, details, estimateDate, estimateTime }) {
+function buildCalendarUrl({ text, details, address, estimateDate, estimateTime }) {
   const { start, end } = estimateToUtcRange(estimateDate, estimateTime);
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text,
+    dates: `${toGCalStamp(start)}/${toGCalStamp(end)}`,
+    details,
+    location: address || 'San Antonio, TX',
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+// Owner-facing invite — framed around who's coming and what they need.
+function buildOwnerCalendarUrl({ name, phone, email, address, projectType, details, estimateDate, estimateTime }) {
   const descriptionLines = [
     `Customer: ${name}`,
     `Phone: ${formatPhoneDisplay(phone)}`,
@@ -184,14 +196,28 @@ function buildGoogleCalendarUrl({ name, phone, email, address, projectType, deta
     `Project type: ${projectType}`,
     details ? `Details: ${details}` : null,
   ].filter(Boolean);
-  const params = new URLSearchParams({
-    action: 'TEMPLATE',
+  return buildCalendarUrl({
     text: `Free Estimate — ${name} (${projectType})`,
-    dates: `${toGCalStamp(start)}/${toGCalStamp(end)}`,
     details: descriptionLines.join('\n'),
-    location: address || 'San Antonio, TX',
+    address,
+    estimateDate,
+    estimateTime,
   });
-  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+// Customer-facing invite — framed around the visit they're expecting.
+function buildCustomerCalendarUrl({ projectType, address, estimateDate, estimateTime }) {
+  const descriptionLines = [
+    `Ameen Painting LLC will arrive for your free ${projectType.toLowerCase()} estimate.`,
+    `Questions or need to reschedule? Call (210) 802-0818 or email ameenpaintingteam@gmail.com.`,
+  ];
+  return buildCalendarUrl({
+    text: 'Free Painting Estimate — Ameen Painting LLC',
+    details: descriptionLines.join('\n'),
+    address,
+    estimateDate,
+    estimateTime,
+  });
 }
 
 function hourFromTime(time) {
@@ -400,28 +426,30 @@ async function handleQuoteSubmit(request, env) {
     }
 
     // The booking itself is already committed at this point — a failure to
-    // notify the owner (Resend outage, etc.) shouldn't make the customer
-    // think their booking didn't go through. Log it for follow-up instead of
-    // surfacing it as an error.
+    // send either email (Resend outage, etc.) shouldn't make the customer
+    // think their booking didn't go through. Each is independent and
+    // best-effort: log on failure instead of surfacing it as an error.
     let emailId = null;
     try {
       const emailResult = await sendLeadEmail({
-        resendApiKey,
-        name,
-        phone,
-        email,
-        address,
-        projectType,
-        details,
-        estimateDate,
-        estimateTime,
+        resendApiKey, name, phone, email, address, projectType, details, estimateDate, estimateTime,
       });
       emailId = emailResult.id;
     } catch (emailErr) {
       console.error(`Lead email failed for booking ${estimateDate} ${estimateTime} (${email}):`, emailErr);
     }
 
-    return jsonResponse({ success: true, id: emailId });
+    try {
+      await sendConfirmationEmail({
+        resendApiKey, name, email, address, projectType, estimateDate, estimateTime,
+      });
+    } catch (emailErr) {
+      console.error(`Confirmation email failed for booking ${estimateDate} ${estimateTime} (${email}):`, emailErr);
+    }
+
+    const googleCalendarUrl = buildCustomerCalendarUrl({ projectType, address, estimateDate, estimateTime });
+
+    return jsonResponse({ success: true, id: emailId, googleCalendarUrl });
   } catch (err) {
     console.error('handleQuoteSubmit error:', err);
     return jsonError('Something went wrong while booking your estimate. Please try again, or call us at (210) 802-0818.', 500);
@@ -429,40 +457,21 @@ async function handleQuoteSubmit(request, env) {
 }
 
 // ---------------------------------------------------------------------------
-// Lead email via Resend
+// Resend helpers
 // ---------------------------------------------------------------------------
-async function sendLeadEmail({ resendApiKey, name, phone, email, address, projectType, details, estimateDate, estimateTime }) {
-  const escapeHtml = (unsafe) => {
-    if (!unsafe) return '';
-    return unsafe
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  };
+function escapeHtml(unsafe) {
+  if (!unsafe) return '';
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
-  const safeName = escapeHtml(name);
-  const safePhone = escapeHtml(phone);
-  const safePhoneDisplay = escapeHtml(formatPhoneDisplay(phone));
-  const safeEmail = escapeHtml(email);
-  const safeAddress = escapeHtml(address);
-  const safeProjectType = escapeHtml(projectType);
-  const safeDetails = escapeHtml(details);
-  const estimateDateLong = escapeHtml(formatDateLong(estimateDate));
-  const estimateTimeLabel = escapeHtml(formatTimeLabel(estimateTime));
-  const googleCalendarUrl = escapeHtml(
-    buildGoogleCalendarUrl({ name, phone, email, address, projectType, details, estimateDate, estimateTime })
-  );
-
-  const htmlContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Lead - Ameen Painting</title>
-  <style>
+// Shared visual chrome for both the owner lead-notification email and the
+// customer confirmation email — keeps them looking like the same system.
+const EMAIL_STYLES = `
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: #f4f6f4;
@@ -495,7 +504,31 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
     .btn-calendar { background-color: #ffffff; color: #0C1C0C !important; padding: 14px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 15px; display: inline-block; border: 1.5px solid #C9A84C; margin: 0 6px 12px; }
     .email-footer { background-color: #0C1C0C; color: #9A9B8F; text-align: center; padding: 25px 40px; font-size: 12px; border-top: 1px solid #142014; }
     .email-footer a { color: #C9A84C; text-decoration: none; }
-  </style>
+`;
+
+// Owner-facing lead notification — sent to the business.
+function buildLeadEmailHtml({ name, phone, email, address, projectType, details, estimateDate, estimateTime }) {
+  const safeName = escapeHtml(name);
+  const safePhone = escapeHtml(phone);
+  const safePhoneDisplay = escapeHtml(formatPhoneDisplay(phone));
+  const safeEmail = escapeHtml(email);
+  const safeAddress = escapeHtml(address);
+  const safeProjectType = escapeHtml(projectType);
+  const safeDetails = escapeHtml(details);
+  const estimateDateLong = escapeHtml(formatDateLong(estimateDate));
+  const estimateTimeLabel = escapeHtml(formatTimeLabel(estimateTime));
+  const googleCalendarUrl = escapeHtml(
+    buildOwnerCalendarUrl({ name, phone, email, address, projectType, details, estimateDate, estimateTime })
+  );
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Lead - Ameen Painting</title>
+  <style>${EMAIL_STYLES}</style>
 </head>
 <body>
   <div class="email-wrapper">
@@ -554,7 +587,73 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
 </body>
 </html>
   `;
+}
 
+// Customer-facing booking confirmation.
+function buildConfirmationEmailHtml({ name, address, projectType, estimateDate, estimateTime }) {
+  const safeName = escapeHtml(name);
+  const safeAddress = escapeHtml(address);
+  const safeProjectType = escapeHtml(projectType);
+  const estimateDateLong = escapeHtml(formatDateLong(estimateDate));
+  const estimateTimeLabel = escapeHtml(formatTimeLabel(estimateTime));
+  const googleCalendarUrl = escapeHtml(
+    buildCustomerCalendarUrl({ projectType, address, estimateDate, estimateTime })
+  );
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Booked - Ameen Painting</title>
+  <style>${EMAIL_STYLES}</style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-container">
+      <div class="email-header">
+        <h1>Ameen Painting LLC</h1>
+        <p>Estimate Confirmed</p>
+      </div>
+      <div class="email-body">
+        <p class="email-intro">Hi ${safeName},</p>
+        <p class="email-intro">Thanks for booking with Ameen Painting! Your free ${safeProjectType.toLowerCase()} estimate is confirmed for the time below.</p>
+
+        <div class="estimate-block">
+          <div class="field-label">Your Estimate</div>
+          <div class="field-value">${estimateDateLong} at ${estimateTimeLabel}</div>
+          <p class="estimate-note">The visit typically takes 15–30 minutes.</p>
+        </div>
+
+        <div class="field-card">
+          <div class="field-row">
+            <div class="field-label">Property Address</div>
+            <div class="field-value">${safeAddress ? safeAddress : '<i>Not provided</i>'}</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Project Type</div>
+            <div class="field-value highlight">${safeProjectType}</div>
+          </div>
+        </div>
+
+        <p class="email-intro" style="margin-bottom: 0;">Need to reschedule or have a question? Just reply to this email, or call us at <a href="tel:+12108020818" style="color:#2D6A2D; font-weight:600; text-decoration:none;">(210) 802-0818</a>.</p>
+
+        <div class="action-container">
+          <a href="${googleCalendarUrl}" target="_blank" rel="noopener noreferrer" class="btn-calendar">Add to Google Calendar</a>
+        </div>
+      </div>
+      <div class="email-footer">
+        <p>Sent via Ameen Painting Website Booking System &bull; Powered by Resend</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+async function sendResendEmail({ resendApiKey, to, replyTo, subject, html }) {
   const resendResponse = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -562,11 +661,11 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Ameen Painting Leads <leads@reports.ameenpainting.com>',
-      to: ['ameenpaintingteam@gmail.com'],
-      reply_to: email,
-      subject: `New Lead + Booking: ${name} — ${projectType} on ${estimateDateLong}`,
-      html: htmlContent,
+      from: 'Ameen Painting LLC <leads@reports.ameenpainting.com>',
+      to: [to],
+      reply_to: replyTo,
+      subject,
+      html,
     }),
   });
 
@@ -576,4 +675,24 @@ async function sendLeadEmail({ resendApiKey, name, phone, email, address, projec
   }
 
   return await resendResponse.json();
+}
+
+async function sendLeadEmail({ resendApiKey, name, phone, email, address, projectType, details, estimateDate, estimateTime }) {
+  return sendResendEmail({
+    resendApiKey,
+    to: 'ameenpaintingteam@gmail.com',
+    replyTo: email,
+    subject: `New Lead + Booking: ${name} — ${projectType} on ${formatDateLong(estimateDate)}`,
+    html: buildLeadEmailHtml({ name, phone, email, address, projectType, details, estimateDate, estimateTime }),
+  });
+}
+
+async function sendConfirmationEmail({ resendApiKey, name, email, address, projectType, estimateDate, estimateTime }) {
+  return sendResendEmail({
+    resendApiKey,
+    to: email,
+    replyTo: 'ameenpaintingteam@gmail.com',
+    subject: `You're booked! Ameen Painting estimate on ${formatDateLong(estimateDate)}`,
+    html: buildConfirmationEmailHtml({ name, address, projectType, estimateDate, estimateTime }),
+  });
 }
