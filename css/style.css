@@ -302,8 +302,13 @@ section[id] { scroll-margin-top: 90px; }
   transform-origin: center;
 }
 
-/* Mobile nav */
-@media (max-width: 768px) {
+/* Mobile nav
+   1024px (not 768px) so phones in landscape (e.g. 844-932px), larger
+   phones, and "Request Desktop Site" mode still get the hamburger instead
+   of the full desktop nav overflowing off-screen (body has overflow-x:
+   hidden, so that overflow was silently invisible rather than scrollable —
+   this is what was happening on the owner's phone). */
+@media (max-width: 1024px) {
   .hamburger { display: flex; }
   #main-nav {
     position: fixed;
