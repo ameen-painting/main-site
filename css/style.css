@@ -2198,10 +2198,10 @@ section[id] { scroll-margin-top: 90px; }
   .quote-times { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 7px; }
 }
 
-/* ---- 14. SCROLL TO TOP ---- */
-.scroll-top-btn {
+/* ---- 14. SCROLL TO TOP & CALL BUTTON ---- */
+.scroll-top-btn,
+.call-btn {
   position: fixed;
-  right: 24px;
   bottom: 24px;
   z-index: 900;
   width: 54px;
@@ -2213,19 +2213,31 @@ section[id] { scroll-margin-top: 90px; }
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: opacity 0.25s ease, transform 0.25s ease, background var(--trans);
+}
+.scroll-top-btn svg,
+.call-btn svg { width: 22px; height: 22px; }
+.scroll-top-btn:hover,
+.call-btn:hover { background: var(--accent-lt); }
+
+.scroll-top-btn {
+  left: 24px;
   opacity: 0;
   transform: translateY(12px);
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease, background var(--trans);
 }
-.scroll-top-btn svg { width: 22px; height: 22px; }
 .scroll-top-btn.is-visible {
   opacity: 1;
   transform: none;
   pointer-events: auto;
 }
-.scroll-top-btn:hover { background: var(--accent-lt); }
+
+.call-btn { right: 24px; }
+.call-btn:hover { transform: translateY(-2px); }
 
 @media (max-width: 640px) {
-  .scroll-top-btn { right: 16px; bottom: 16px; width: 56px; height: 56px; }
+  .scroll-top-btn,
+  .call-btn { width: 56px; height: 56px; }
+  .scroll-top-btn { left: 16px; }
+  .call-btn { right: 16px; }
 }
