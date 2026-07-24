@@ -50,7 +50,10 @@ function initQuoteBooking() {
   let selectedTime = null;
   let savedFormData = null;
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // ASCII-only — matches the backend's check. Non-ASCII addresses pass a
+  // looser regex but get rejected later by the email API's reply-to header,
+  // which used to surface as a confusing error only after the calendar step.
+  const emailPattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
   const phonePattern = /^[0-9()+\-.\s]{7,}$/;
   const MAX_ADVANCE_DAYS = 90;
 

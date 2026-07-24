@@ -114,6 +114,14 @@ function isValidPhone(str) {
   return digits >= 7 && /^\+?[0-9()+\-.\s]{7,20}$/.test(str);
 }
 
+// ASCII-only — matches what Resend's API requires for the `reply_to` header.
+// Rejects addresses with accented/unicode characters here, at submit time,
+// instead of letting them through to a confusing failure at send time.
+const EMAIL_PATTERN = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+function isValidEmail(str) {
+  return EMAIL_PATTERN.test(str);
+}
+
 // Formats a stored phone number for human display in the lead email.
 // E.164 US/Canada numbers (+1XXXXXXXXXX) become "(XXX) XXX-XXXX"; anything
 // else (other countries, or a raw fallback value) is shown as-is.
@@ -300,7 +308,8 @@ async function handleAvailability(request, env) {
 
     return jsonError('Provide ?date=YYYY-MM-DD or ?month=YYYY-MM.', 400);
   } catch (err) {
-    return jsonError(`Server Error: ${err.message}`, 500);
+    console.error('handleAvailability error:', err);
+    return jsonError('Could not load availability right now. Please try again.', 500);
   }
 }
 
@@ -334,6 +343,7 @@ async function handleQuoteSubmit(request, env) {
     }
 
     if (!isValidPhone(phone)) return jsonError('Please provide a valid phone number.', 400);
+    if (!isValidEmail(email)) return jsonError('Please provide a valid email address.', 400);
     if (!isValidDate(estimateDate)) return jsonError('Invalid estimate date.', 400);
     if (!isValidTime(estimateTime)) return jsonError('Invalid estimate time.', 400);
 
@@ -389,21 +399,32 @@ async function handleQuoteSubmit(request, env) {
       throw dbErr;
     }
 
-    const emailResult = await sendLeadEmail({
-      resendApiKey,
-      name,
-      phone,
-      email,
-      address,
-      projectType,
-      details,
-      estimateDate,
-      estimateTime,
-    });
+    // The booking itself is already committed at this point — a failure to
+    // notify the owner (Resend outage, etc.) shouldn't make the customer
+    // think their booking didn't go through. Log it for follow-up instead of
+    // surfacing it as an error.
+    let emailId = null;
+    try {
+      const emailResult = await sendLeadEmail({
+        resendApiKey,
+        name,
+        phone,
+        email,
+        address,
+        projectType,
+        details,
+        estimateDate,
+        estimateTime,
+      });
+      emailId = emailResult.id;
+    } catch (emailErr) {
+      console.error(`Lead email failed for booking ${estimateDate} ${estimateTime} (${email}):`, emailErr);
+    }
 
-    return jsonResponse({ success: true, id: emailResult.id });
+    return jsonResponse({ success: true, id: emailId });
   } catch (err) {
-    return jsonError(`Server Error: ${err.message}`, 500);
+    console.error('handleQuoteSubmit error:', err);
+    return jsonError('Something went wrong while booking your estimate. Please try again, or call us at (210) 802-0818.', 500);
   }
 }
 

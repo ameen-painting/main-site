@@ -1652,10 +1652,15 @@ section[id] { scroll-margin-top: 90px; }
 }
 .iti__country-name { color: var(--text); }
 .iti__country.iti__highlight { background-color: var(--accent-dim); }
-.iti__search-input {
+.form-field .iti__search-input {
   background: var(--bg-alt);
   color: var(--text);
   border-bottom: 1px solid var(--border);
+  /* .form-field input's flat padding otherwise wins (higher specificity) and
+     clobbers the library's own icon-clearance padding, overlapping the
+     search icon with the placeholder text. */
+  padding-left: 37px;
+  padding-right: 37px;
 }
 .iti__no-results { color: var(--text-muted); }
 
